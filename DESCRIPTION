@@ -1,0 +1,29 @@
+Package: diags4MFCL
+Title: R functions for presenting MULTIFAN-CL results and diagnostics
+Date: 2020-04-28
+Version: 1.0.0
+Authors@R: 
+    person(given = "Nicholas",
+           family = "Ducharme-Barth",
+           role = c("aut", "cre"),
+           email = "nicholasd@spc.int")
+Description: R package that pairs with FLR4MFCL to present results and diagnostics of OFP SAM stock assessment and MSE models using MFCL.
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 7.0.2
+Depends:
+	R (>= 3.6.1) 
+Imports:
+	FLR4MFCL,
+    data.table,
+    magrittr,
+    ggplot2,
+    ggthemes
+Suggests: 
+    roxygen2
+Remotes:
+	PacificCommunity/ofp-sam-flr4mfcl
+URL: https://github.com/PacificCommunity/ofp-sam-diags4MFCL
+BugReports: https://github.com/PacificCommunity/ofp-sam-diags4MFCL/issues
+
