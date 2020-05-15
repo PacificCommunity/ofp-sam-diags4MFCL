@@ -20,8 +20,8 @@ plot.comparisons = function(plot.name,rep.list,rep.names,agg.years = TRUE,agg.re
 			stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
 		} else {
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-			g1 = plot.depletion.compare(rep.list,rep.names,agg.years,agg.regions,biomass.type,palette.cols,save.dir,save.name=paste0("dep-",save.name))
-			g2 = plot.biomass.compare(rep.list,rep.names,agg.years,agg.regions,biomass.type,palette.cols,save.dir,save.name=paste0("bio-",save.name))
+			g1 = plot.depletion(rep.list,rep.names,agg.years,agg.regions,biomass.type,palette.cols,save.dir,save.name=paste0("dep-",save.name))
+			g2 = plot.biomass(rep.list,rep.names,agg.years,agg.regions,biomass.type,palette.cols,save.dir,save.name=paste0("bio-",save.name))
 		}
 	} else {
 		stop("Must provide 'save.dir'.")
