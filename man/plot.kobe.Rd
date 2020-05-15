@@ -9,6 +9,7 @@ plot.kobe(
   rep.name,
   agg.years = TRUE,
   agg.regions = TRUE,
+  biomass.type = "SSB",
   save.dir,
   save.name
 )
@@ -21,6 +22,8 @@ plot.kobe(
 \item{agg.years}{TRUE or FALSE. Should model outputs be aggregated to an annual time step.}
 
 \item{agg.regions}{TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.}
+
+\item{biomass.type}{Character string denoting the type of biomass plotted, 'SSB' or 'Total'}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 

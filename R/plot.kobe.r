@@ -6,6 +6,7 @@
 #' @param rep.name A character string naming the models for plotting purposes
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
+#' @param biomass.type Character string denoting the type of biomass plotted, 'SSB' or 'Total'
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
@@ -29,7 +30,7 @@
 #' @importFrom ggplot2 geom_vline
 #' 
 
-	plot.kobe = function(rep,rep.name,agg.years = TRUE,agg.regions=TRUE,save.dir,save.name)
+	plot.kobe = function(rep,rep.name,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",save.dir,save.name)
 	{
 		warning("The Fmsy value used in this plot corresponds to the estimate for the period specified by par_flag(148). \nMSY is a time dynamic quantity and should be recalculated for each year in the model period. \nAs a result the 'true' trajectory of Fmsy may differ slightly from the one plotted here.")
 
