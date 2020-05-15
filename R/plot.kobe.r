@@ -32,7 +32,7 @@
 
 	plot.kobe = function(rep,rep.name,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",save.dir,save.name)
 	{
-		warning("The Fmsy value used in this plot corresponds to the estimate for the period specified by par_flag(148). \nMSY is a time dynamic quantity and should be recalculated for each year in the model period. \nAs a result the 'true' trajectory of Fmsy may differ slightly from the one plotted here.")
+		warning("The MSY value used in this plot corresponds to the estimate for the period specified by par_flag(148). \nMSY is a time dynamic quantity and should be recalculated for each year in the model period. \nAs a result the 'true' trajectory of SBmsy or Fmsy may differ slightly from the one plotted here.")
 
 			tmp.rep = rep
 			if(agg.years)
