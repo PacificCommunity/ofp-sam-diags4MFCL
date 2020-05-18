@@ -3,7 +3,7 @@
 #' Compare the estimated depletion across different models.
 #' 
 #' @param rep.list A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
-#' @param rep.names A vector of character strings naming the models for plotting purposes
+#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param biomass.type Character string denoting the type of biomass plotted, 'SSB' or 'Total'
@@ -28,14 +28,13 @@
 #' @importFrom ggplot2 geom_hline
 #' 
 
-	plot.depletion = function(rep.list,rep.names,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),save.dir,save.name)
+	plot.depletion = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),save.dir,save.name)
 	{
-		if(length(rep.list)==1)
-		{
-			rep.list = list(rep.list)
-		}
-		names(rep.list) = rep.names
-
+	  
+	  # Check and sanitise input MFCLRep arguments and names
+    rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
+    rep.names <- names(rep.list)
+	  
 		dt.list = as.list(rep(NA,length(rep.list)))
 		names(dt.list) = names(rep.list)
 
