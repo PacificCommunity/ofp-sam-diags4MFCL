@@ -11,7 +11,7 @@
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-#' @importFrom data.table data.table
+#' @importFrom data.table as.data.table
 #' @importFrom data.table rbindlist
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 aes
