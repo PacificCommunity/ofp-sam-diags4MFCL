@@ -10,6 +10,7 @@ plot.comparisons(
   rep.names,
   agg.years = TRUE,
   agg.regions = TRUE,
+  sel.basis = "AGE",
   biomass.type = "SSB",
   palette.cols = c("royalblue3", "deepskyblue1", "gold", "orange1", "indianred1",
     "firebrick2", "#AC2020"),
@@ -25,6 +26,8 @@ plot.comparisons(
 \item{agg.years}{TRUE or FALSE. Should model outputs be aggregated to an annual time step.}
 
 \item{agg.regions}{TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.}
+
+\item{sel.basis}{A character string indicating if selectivity at age ('AGE') or length ('Length') should be plotted}
 
 \item{biomass.type}{Character string denoting the type of biomass plotted, 'SSB' or 'Total'}
 
