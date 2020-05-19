@@ -11,6 +11,7 @@
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
+#' @importFrom data.table setnames
 #' @importFrom data.table as.data.table
 #' @importFrom data.table rbindlist
 #' @importFrom ggthemes theme_few
@@ -44,7 +45,7 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE",palette.cols
 		{
 			tmp.rep = rep.list[[i]]
 			tmp.name = names(rep.list)[i]
-			tmp.sel = as.data.table(sel(tmp.rep)) %>% .[,.(age,unit,value)] %>% .[,age:=as.numeric(age)] %>% .[,unit:=as.numeric(unit)] %>% .[,model:=tmp.name] %>% setnames(.,"unit","fishery") %>% .[order(model,fishery,age),.(model,fishery,age,value)]
+			tmp.sel = data.table::as.data.table(sel(tmp.rep)) %>% .[,.(age,unit,value)] %>% .[,age:=as.numeric(age)] %>% .[,unit:=as.numeric(unit)] %>% .[,model:=tmp.name] %>% data.table::setnames(.,"unit","fishery") %>% .[order(model,fishery,age),.(model,fishery,age,value)]
 			tmp.laa = c(aperm(mean_laa(tmp.rep),c(4,1,2,3,5,6)))
 
 			if(sel.basis == "AGE")
