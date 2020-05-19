@@ -6,7 +6,7 @@
 \usage{
 plot.depletion(
   rep.list,
-  rep.names,
+  rep.names = NULL,
   agg.years = TRUE,
   agg.regions = TRUE,
   biomass.type = "SSB",
@@ -19,7 +19,7 @@ plot.depletion(
 \arguments{
 \item{rep.list}{A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.}
 
-\item{rep.names}{A vector of character strings naming the models for plotting purposes}
+\item{rep.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
 
 \item{agg.years}{TRUE or FALSE. Should model outputs be aggregated to an annual time step.}
 
