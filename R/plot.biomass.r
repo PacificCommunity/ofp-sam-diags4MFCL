@@ -7,9 +7,10 @@
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param biomass.type Character string denoting the type of biomass plotted, 'SSB' or 'Total'
-#' @param palette.cols A vector of character strings giving the colors to form a palette for differentiating between models. If wishing to use the exact colors give a vector of (length(rep.list) - 1) colors as the reference model is black by default.
+#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
@@ -27,7 +28,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", palette.cols = c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"),save.dir,save.name)
+plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", palette.func=default.model.colours, save.dir, save.name, ...)
 {
 	  # Check and sanitise input MFCLRep arguments and names
     rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
@@ -71,13 +72,15 @@ plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRU
 			plot.dt = data.table::rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
 
 		# make plot
+			# Get the colours - if all.model.names passed in using ... then it is passed to palette func
+			colour_values <- palette.func(selected.model.names = names(rep.list), ...)
 			g = plot.dt %>% 
 			ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region) +
 			ggplot2::xlab("Year") +
 			ggplot2::ggtitle("Estimated biomass (1000s mt)") +
 			ggplot2::scale_y_continuous(name=ylab,breaks = pretty,limits=c(0,max(plot.dt$bio))) +
 			ggplot2::geom_line(ggplot2::aes(x=time,y=bio,color=model),size=1.25) +
-			ggplot2::scale_color_manual("Model",values=c("black",colorRampPalette(palette.cols)(length(rep.list)-1))[1:length(rep.list)])
+			ggplot2::scale_color_manual("Model",values=colour_values)
 		
 
 		# write.out
