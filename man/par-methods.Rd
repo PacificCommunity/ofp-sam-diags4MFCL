@@ -5,7 +5,7 @@
 \alias{jitter}
 \title{jitter}
 \usage{
-jitter(par, sd = 0.1, seed = NULL, ...)
+jitter(par, sd, seed)
 }
 \arguments{
 \item{object:}{An object of class MFCLPar}
