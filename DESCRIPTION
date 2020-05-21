@@ -19,7 +19,8 @@ Imports:
     data.table,
     magrittr,
     ggplot2,
-    ggthemes
+    ggthemes,
+    RColorBrewer
 Suggests: 
     roxygen2
 Remotes:

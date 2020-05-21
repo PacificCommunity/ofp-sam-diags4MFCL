@@ -96,6 +96,7 @@ default.model.colours <- function(selected.model.names, all.model.names=selected
 
 # My colours function is called
 #' @rdname colour.palettes
+#' @importFrom RColorBrewer brewer.pal
 #' @export
 colourblind.model.colours <- function(selected.model.names, all.model.names=selected.model.names){
   out <- colorRampPalette(RColorBrewer::brewer.pal(12,"Paired"))(length(all.model.names))
