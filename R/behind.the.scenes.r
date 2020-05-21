@@ -58,3 +58,50 @@ check.rep.args <- function(rep, rep.names=NULL){
 #check.rep.args(rep=rep_list_unnamed, rep.names=c("Bob","Carol","Ted"))
 #check.rep.args(rep=rep_list_named)
 
+# Palette functions - these can be passed into the plotting function to set the palette.
+# The two name arguments are important because if you are only plotting a subset of the models
+# you don't want the colour of the models to change.
+# These need to be exported
+
+#' Model palettes
+#' 
+#' These palettes can be passed to the plotting functions to change the model colours.
+#' By passing in the \code{all.model.names} it is possible to ensure that the model colours are consistent when plotting subsets of the full model set.
+#' You can even write your own function.
+#' 
+#' @param selected.model.names A character vector of the subset of model names you want to plot.
+#' @param all.model.names A character vector of the all model names
+#' @return A named vector of colours, the same length and names as the models to be plotted.
+#' @name Colour palettes
+#' @rdname colour.palettes
+#' @examples 
+#' all.model.names <- c("a","b","c","d")
+#' # If you don't supply all.model.names, the colours for the models will not be consistent
+#' default.model.colours(selected.model.names=all.model.names[1:2])
+#' default.model.colours(selected.model.names=all.model.names[3:4])
+#' # Colours for the models should not change when subsetting
+#' # Supply all.model.names to make consistent
+#' default.model.colours(selected.model.names=all.model.names, all.model.names=all.model.names)
+#' default.model.colours(selected.model.names=all.model.names[1:2], all.model.names=all.model.names)
+#' default.model.colours(selected.model.names=all.model.names[3:4], all.model.names=all.model.names)
+#' @export
+default.model.colours <- function(selected.model.names, all.model.names=selected.model.names){
+  palette.cols <- c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020")
+  out <- colorRampPalette(palette.cols)(length(all.model.names)-1)
+  out <- c("black",out)[1:length(all.model.names)]
+  names(out) <- all.model.names
+  out <- out[selected.model.names]
+  return(out)
+}
+
+# My colours function is called
+#' @rdname colour.palettes
+#' @export
+colourblind.model.colours <- function(selected.model.names, all.model.names=selected.model.names){
+  out <- colorRampPalette(RColorBrewer::brewer.pal(12,"Paired"))(length(all.model.names))
+  names(out) <- all.model.names
+  out <- out[selected.model.names]
+  return(out)
+}
+
+
