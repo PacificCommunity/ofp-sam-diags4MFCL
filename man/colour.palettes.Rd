@@ -4,6 +4,7 @@
 \alias{Colour palettes}
 \alias{default.model.colours}
 \alias{colourblind.model.colours}
+\alias{rainbow.model.colours}
 \title{Model palettes}
 \usage{
 default.model.colours(
@@ -12,6 +13,11 @@ default.model.colours(
 )
 
 colourblind.model.colours(
+  selected.model.names,
+  all.model.names = selected.model.names
+)
+
+rainbow.model.colours(
   selected.model.names,
   all.model.names = selected.model.names
 )

@@ -105,4 +105,14 @@ colourblind.model.colours <- function(selected.model.names, all.model.names=sele
   return(out)
 }
 
-
+# Rainbow colors
+#' @rdname colour.palettes
+#' @export
+rainbow.model.colours <- function(selected.model.names, all.model.names=selected.model.names){
+  palette.cols <- c("#f44336","#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#03a9f4","#00bcd4","#009688","#4caf50","#8bc34a","#cddc39","#ffeb3b","#ffc107","#ff9800")
+  out <- colorRampPalette(palette.cols)(length(all.model.names)-1)
+  out <- c("black",out)[1:length(all.model.names)]
+  names(out) <- all.model.names
+  out <- out[selected.model.names]
+  return(out)
+}
