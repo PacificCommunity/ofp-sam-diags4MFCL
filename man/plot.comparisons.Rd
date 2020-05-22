@@ -7,7 +7,7 @@
 plot.comparisons(
   plot.name,
   rep.list,
-  rep.names,
+  model.names,
   agg.years = TRUE,
   agg.regions = TRUE,
   sel.basis = "AGE",
@@ -21,7 +21,7 @@ plot.comparisons(
 \arguments{
 \item{rep.list}{A list of MFCLRep objects. The reference model should be listed first.}
 
-\item{rep.names}{A vector of character strings naming the models for plotting purposes}
+\item{model.names}{A vector of character strings naming the models for plotting purposes}
 
 \item{agg.years}{TRUE or FALSE. Should model outputs be aggregated to an annual time step.}
 

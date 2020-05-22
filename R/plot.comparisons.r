@@ -1,7 +1,7 @@
 #' Wrapper function for plotting model comparisons
 #' 
 #' @param rep.list A list of MFCLRep objects. The reference model should be listed first.
-#' @param rep.names A vector of character strings naming the models for plotting purposes
+#' @param model.names A vector of character strings naming the models for plotting purposes
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param sel.basis A character string indicating if selectivity at age ('AGE') or length ('Length') should be plotted
@@ -13,7 +13,7 @@
 #' @export
 #' 
 
-plot.comparisons = function(plot.name,rep.list,rep.names,agg.years = TRUE,agg.regions=TRUE,sel.basis="AGE",biomass.type = "SSB",palette.func=default.model.colours,save.dir,save.name,...)
+plot.comparisons = function(plot.name,rep.list,model.names,agg.years = TRUE,agg.regions=TRUE,sel.basis="AGE",biomass.type = "SSB",palette.func=default.model.colours,save.dir,save.name,...)
 {
 	if(!missing(save.dir))
 	{
@@ -22,9 +22,10 @@ plot.comparisons = function(plot.name,rep.list,rep.names,agg.years = TRUE,agg.re
 			stop("How can you save the output if you haven't specified the name? Please specify 'save.name'.")
 		} else {
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-			g1 = plot.depletion(rep.list,rep.names,agg.years,agg.regions,biomass.type,palette.func,save.dir,save.name=paste0("dep-",save.name),...)
-			g2 = plot.biomass(rep.list,rep.names,agg.years,agg.regions,biomass.type,palette.func,save.dir,save.name=paste0("bio-",save.name),...)
-			g3 = plot.selectivity(rep.list,rep.names,sel.basis,palette.func,save.dir,save.name=paste0("sel-",tolower(sel.basis),"-",save.name),...)
+			g1 = plot.depletion(rep.list,model.names,agg.years,agg.regions,biomass.type,palette.func,save.dir,save.name=paste0("dep-",save.name),...)
+			g2 = plot.biomass(rep.list,model.names,agg.years,agg.regions,biomass.type,palette.func,save.dir,save.name=paste0("bio-",save.name),...)
+			g3 = plot.selectivity(rep.list,model.names,sel.basis,palette.func,save.dir,save.name=paste0("sel-",tolower(sel.basis),"-",save.name),...)
+			g4 = plot.growth(rep.list,model.names,palette.func,save.dir,save.name=paste0("gro-",save.name),...)
 		}
 	} else {
 		stop("Must provide 'save.dir'.")
