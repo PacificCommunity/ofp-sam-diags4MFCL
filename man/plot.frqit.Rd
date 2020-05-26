@@ -4,12 +4,12 @@
 \alias{plot.frqit}
 \title{Plot a frqit::frq object}
 \usage{
-plot.frqit(frq.list, frq.names = NULL, fdesc = NULL, save.dir, save.name)
+plot.frqit(Frq.list, Frq.names = NULL, fdesc = NULL, save.dir, save.name)
 }
 \arguments{
-\item{frq.list}{A list of frq objects or a single frq object. The reference model should be listed first.}
+\item{Frq.list}{A list of Frq objects or a single Frq object. The reference model should be listed first.}
 
-\item{frq.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
+\item{Frq.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
 
 \item{fdesc}{A data.frame with 7 columns (num,gear_long,method,code,gear,flag,region) and n rows, where n is the number of defined fisheries.}
 

@@ -2,8 +2,8 @@
 
 #' Plot a frqit::frq object
 #' 
-#' @param frq.list A list of frq objects or a single frq object. The reference model should be listed first.
-#' @param frq.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param Frq.list A list of Frq objects or a single Frq object. The reference model should be listed first.
+#' @param Frq.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
 #' @param fdesc A data.frame with 7 columns (num,gear_long,method,code,gear,flag,region) and n rows, where n is the number of defined fisheries.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
@@ -31,11 +31,11 @@
 #' @importFrom ggplot2 scale_color_viridis_c
 #' @importFrom ggplot2 scale_fill_gradientn
 
-	plot.frqit = function(frq.list,frq.names=NULL,fdesc=NULL, save.dir,save.name)
+	plot.frqit = function(Frq.list,Frq.names=NULL,fdesc=NULL, save.dir,save.name)
 	{
 	  
-	  # Check and sanitise input frq arguments and names
-	    frq.list = check.frq.args(frq=frq.list, frq.names=frq.names)
+	  # Check and sanitise input Frq arguments and names
+	    frq.list = check.frqit.args(frq=Frq.list, frq.names=Frq.names)
 	    frq.names = names(frq.list)
 	  
 		if(length(frq.list)>1)
