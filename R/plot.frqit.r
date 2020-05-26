@@ -8,12 +8,10 @@
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
-#' @import FLR4MFCL
 #' @import frqit
 #' @import magrittr
 #' @importFrom data.table as.data.table
 #' @importFrom data.table melt
-#' @importFrom data.table merge
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 ggplot

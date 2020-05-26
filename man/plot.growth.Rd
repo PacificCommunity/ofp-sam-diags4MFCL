@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.growth.r
 \name{plot.growth}
 \alias{plot.growth}
-\title{Compare the estimated growth across different models.}
+\title{Compare the estimated growth across different models. If plotting a single model the 95% confidence region around the growth curve from the estimated standard deviation at age is also plotted.}
 \usage{
 plot.growth(
   rep.list,
@@ -27,5 +27,5 @@ plot.growth(
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
 }
 \description{
-Compare the estimated growth across different models.
+Compare the estimated growth across different models. If plotting a single model the 95% confidence region around the growth curve from the estimated standard deviation at age is also plotted.
 }
