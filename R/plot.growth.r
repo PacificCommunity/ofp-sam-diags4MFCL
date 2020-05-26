@@ -1,6 +1,6 @@
 
 
-#' Compare the estimated growth across different models. If plotting a single model the 95% confidence region around the growth curve from the estimated standard deviation at age is also plotted.
+#' Compare the estimated growth across different models. If plotting a single model the 95 percent confidence region around the growth curve from the estimated standard deviation at age is also plotted.
 #' 
 #' @param rep.list A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
 #' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
