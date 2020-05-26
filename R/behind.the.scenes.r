@@ -36,6 +36,40 @@ check.rep.args <- function(rep, rep.names=NULL){
   }
   return(rep)
 }
+
+check.frq.args <- function(frq, frq.names=NULL){
+  bad_argument_types_message <- "The function is expecting a frq object from the frqit package, or a list of frq objects."
+  # If just a single frq coerce to an unamed list
+  if (class(frq) == "frq"){
+    frq <- list(frq)
+  }
+  # If it is a list, check that all elements are frq objects, otherwise fail
+  if (class(frq) == "list"){
+    if(!all(lapply(frq, class)=="frq")){
+      stop(bad_argument_types_message)
+    }
+  }
+  # If it's not a list of frq objects, fail
+  else {
+      stop(bad_argument_types_message)
+  }
+  
+  # At this point frq is a list of frq objects
+  # If frq.names is supplied, then name the list - overwriting any existing names
+  if (!is.null(frq.names)){
+    # Check length of frq.names matches length of list
+    if(length(frq.names)!=length(frq)){
+      stop("Length of frq.names must match the number of frq objects.")
+    }
+    names(frq) <- frq.names
+  }
+  # If there are still no names, make some up
+  if(is.null(names(frq))){
+     fake_names <- paste("Model", seq(from=1, to=length(frq)), sep="") 
+     names(frq) <- fake_names
+  }
+  return(frq)
+}
       
 
 ## Some tests - could be added to unit tests if needed

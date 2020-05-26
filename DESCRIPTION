@@ -20,10 +20,12 @@ Imports:
     magrittr,
     ggplot2,
     ggthemes,
-    RColorBrewer
+    RColorBrewer,
+    frqit
 Suggests: 
     roxygen2
 Remotes:
 	PacificCommunity/ofp-sam-flr4mfcl
+  PacificCommunity/ofp-sam-frqit
 URL: https://github.com/PacificCommunity/ofp-sam-diags4MFCL
 BugReports: https://github.com/PacificCommunity/ofp-sam-diags4MFCL/issues
