@@ -2,8 +2,8 @@
 
 #' Plot a frqit::frq object
 #' 
-#' @param frq.list A list of frq objects or a single frq object. The reference model should be listed first.
-#' @param frq.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param Frq.list A list of Frq objects or a single Frq object. The reference model should be listed first.
+#' @param Frq.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
 #' @param fdesc A data.frame with 7 columns (num,gear_long,method,code,gear,flag,region) and n rows, where n is the number of defined fisheries.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
@@ -31,11 +31,11 @@
 #' @importFrom ggplot2 scale_color_viridis_c
 #' @importFrom ggplot2 scale_fill_gradientn
 
-	plot.frqit = function(frq.list,frq.names=NULL,fdesc=NULL, save.dir,save.name)
+	plot.frqit = function(Frq.list,Frq.names=NULL,fdesc=NULL, save.dir,save.name)
 	{
 	  
-	  # Check and sanitise input frq arguments and names
-	    frq.list = check.frq.args(frq=frq.list, frq.names=frq.names)
+	  # Check and sanitise input Frq arguments and names
+	    frq.list = check.frqit.args(frq=Frq.list, frq.names=Frq.names)
 	    frq.names = names(frq.list)
 	  
 		if(length(frq.list)>1)
@@ -92,12 +92,11 @@
 				ggplot2::geom_hline(yintercept=1) +
 				ggplot2::xlab("Year") +
 				ggplot2::ylab("CPUE") +
-				ggplot2::ggtitle("CPUE by fishery") +
-				ggplot2::geom_point(ggplot2::aes(x=ts,y=cpue),fill="gray70",size=2,shape=21)
+				ggplot2::ggtitle("CPUE by fishery")
 				if(length(unique(ifelse(cep.dt$penalty<0,NA,cep.dt$penalty)))>1)
 				{
 					g.cpue = g.cpue + ggplot2::geom_point(ggplot2::aes(x=ts,y=cpue,fill=penalty),size=2,shape=21) +
-									  ggplot2::scale_color_viridis_c("Penalty weight")
+									  ggplot2::scale_fill_viridis_c("Penalty weight")
 
 					g.pen = data.table::as.data.table(cateffpen(tmp.frq)) %>% .[,ts:=year+(month/12)+(week/48)] %>% .[,Region:=fishery.reg[fishery]] %>%
 					.[,Region := factor(as.character(Region),levels=as.character(sort(unique(Region))))] %>% .[,Fishery := factor(fdesc$name[fishery],levels=fdesc$name)] %>%
@@ -108,8 +107,8 @@
 					ggplot2::xlab("Year") +
 					ggplot2::ylab("CPUE") +
 					ggplot2::ggtitle("CPUE by fishery") +
-					ggplot2::geom_point(ggplot2::aes(x=ts,y=penalty),fill=penalty,size=2,shape=21) +
-					ggplot2::scale_color_viridis_c("Penalty weight")
+					ggplot2::geom_point(ggplot2::aes(x=ts,y=penalty,fill=penalty),size=2,shape=21) +
+					ggplot2::scale_fill_viridis_c("Penalty weight")
 
 					# write.out
 					if(!missing(save.dir))
@@ -123,6 +122,7 @@
 						}
 					} 
 				} else{
+					g.cpue = g.cpue + ggplot2::geom_point(ggplot2::aes(x=ts,y=cpue),fill="gray70",size=2,shape=21)
 					g.pen = NULL
 				}
 
@@ -146,7 +146,6 @@
 				 			data.table::melt(.,id.vars=c("ts","year","month","week","fishery","Fishery"),variable.name = "Length",value.name = "N") %>%
 				 			.[,Length:=as.numeric(as.character(Length))] %>% .[N>0] %>% .[order(fishery,ts,Length)] %>%
 				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~Fishery,scales="free_y",drop = FALSE) +
-				ggplot2::xlim(tail(range(tmp.frq),n=2)[1],tail(range(tmp.frq),n=2)[2]+1) + 
 				ggplot2::geom_hline(yintercept=0) +
 				ggplot2::xlab("Length") +
 				ggplot2::ylab("Observations") +
@@ -196,7 +195,6 @@
 				 			data.table::melt(.,id.vars=c("ts","year","month","week","fishery","Fishery"),variable.name = "Weight",value.name = "N") %>%
 				 			.[,Weight:=as.numeric(as.character(Weight))] %>% .[N>0] %>% .[order(fishery,ts,Weight)] %>%
 				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~Fishery,scales="free_y",drop = FALSE) +
-				ggplot2::xlim(tail(range(tmp.frq),n=2)[1],tail(range(tmp.frq),n=2)[2]+1) + 
 				ggplot2::geom_hline(yintercept=0) +
 				ggplot2::xlab("Weight") +
 				ggplot2::ylab("Observations") +
@@ -252,7 +250,7 @@
 			}
 		} 
 			
-		return(list(catch=g.catch,cpue=g.cpue,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
+		return(list(catch=g.catch,cpue=g.cpue,pen=g.pen,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
 			wt_hist_time=g.wt_hist_time,wt_hist=g.wt_hist,wt_heat=g.wt_heat))
 
 	}	

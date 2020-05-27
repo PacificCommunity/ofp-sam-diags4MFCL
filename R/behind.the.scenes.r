@@ -37,15 +37,15 @@ check.rep.args <- function(rep, rep.names=NULL){
   return(rep)
 }
 
-check.frq.args <- function(frq, frq.names=NULL){
-  bad_argument_types_message <- "The function is expecting a frq object from the frqit package, or a list of frq objects."
+check.frqit.args <- function(frq, frq.names=NULL){
+  bad_argument_types_message <- "The function is expecting a Frq object from the frqit package, or a list of Frq objects."
   # If just a single frq coerce to an unamed list
-  if (class(frq) == "frq"){
+  if (class(frq) == "Frq"){
     frq <- list(frq)
   }
   # If it is a list, check that all elements are frq objects, otherwise fail
   if (class(frq) == "list"){
-    if(!all(lapply(frq, class)=="frq")){
+    if(!all(lapply(frq, class)=="Frq")){
       stop(bad_argument_types_message)
     }
   }
