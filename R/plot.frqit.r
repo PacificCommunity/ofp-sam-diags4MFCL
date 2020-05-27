@@ -146,7 +146,6 @@
 				 			data.table::melt(.,id.vars=c("ts","year","month","week","fishery","Fishery"),variable.name = "Length",value.name = "N") %>%
 				 			.[,Length:=as.numeric(as.character(Length))] %>% .[N>0] %>% .[order(fishery,ts,Length)] %>%
 				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~Fishery,scales="free_y",drop = FALSE) +
-				ggplot2::xlim(tail(range(tmp.frq),n=2)[1],tail(range(tmp.frq),n=2)[2]+1) + 
 				ggplot2::geom_hline(yintercept=0) +
 				ggplot2::xlab("Length") +
 				ggplot2::ylab("Observations") +
@@ -196,7 +195,6 @@
 				 			data.table::melt(.,id.vars=c("ts","year","month","week","fishery","Fishery"),variable.name = "Weight",value.name = "N") %>%
 				 			.[,Weight:=as.numeric(as.character(Weight))] %>% .[N>0] %>% .[order(fishery,ts,Weight)] %>%
 				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~Fishery,scales="free_y",drop = FALSE) +
-				ggplot2::xlim(tail(range(tmp.frq),n=2)[1],tail(range(tmp.frq),n=2)[2]+1) + 
 				ggplot2::geom_hline(yintercept=0) +
 				ggplot2::xlab("Weight") +
 				ggplot2::ylab("Observations") +
@@ -252,7 +250,7 @@
 			}
 		} 
 			
-		return(list(catch=g.catch,cpue=g.cpue,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
+		return(list(catch=g.catch,cpue=g.cpue,pen=g.pen,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
 			wt_hist_time=g.wt_hist_time,wt_hist=g.wt_hist,wt_heat=g.wt_heat))
 
 	}	
