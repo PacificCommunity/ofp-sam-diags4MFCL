@@ -79,6 +79,24 @@
 				ggplot2::geom_bar(ggplot2::aes(x=ts,y=catch,fill=Region),stat="identity") +
 				ggplot2::scale_fill_manual("Region",values=colorRampPalette(rainbow.cols)(length(unique(fishery.reg)))) + 
 				ggplot2::geom_text(data=data.frame(Fishery=factor(fdesc$name,levels=fdesc$name),ts=min(cep.dt$year+(cep.dt$month/12)+(cep.dt$week/48)),catch=cep.dt[,.(catch=0.9*max(catch)),by=fishery][order(fishery)]$catch,text=ifelse(fishery.data==0,"N","MT")),ggplot2::aes(x=ts,y=catch,label=text),hjust=0,vjust=1)
+			
+			#____________________________________________________________________________________________________________
+			# Plot effort
+				n.fishery = max(fdesc$num)
+				fishery.data = data_flags(tmp.frq)[1,]
+				fishery.reg = fdesc$region
+				cep.dt = data.table::as.data.table(cateffpen(tmp.frq))
+
+				g.effort = data.table::as.data.table(cateffpen(tmp.frq)) %>% .[,ts:=year+(month/12)+(week/48)] %>% .[,Region:=fishery.reg[fishery]] %>%
+				.[,Region := factor(as.character(Region),levels=as.character(sort(unique(Region))))] %>% .[,Fishery := factor(fdesc$name[fishery],levels=fdesc$name)] %>%
+				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~Fishery,scales="free_y",drop=FALSE) +
+				ggplot2::xlim(tail(range(tmp.frq),n=2)[1],tail(range(tmp.frq),n=2)[2]+1) + 
+				ggplot2::geom_hline(yintercept=0) +
+				ggplot2::xlab("Year") +
+				ggplot2::ylab("Relative Effort") +
+				ggplot2::ggtitle("Effort by fishery") +
+				ggplot2::geom_bar(ggplot2::aes(x=ts,y=effort,fill=Region),stat="identity") +
+				ggplot2::scale_fill_manual("Region",values=colorRampPalette(rainbow.cols)(length(unique(fishery.reg)))) 
 
 			#____________________________________________________________________________________________________________
 			# Plot cpue & penalty weight
@@ -239,6 +257,7 @@
 			} else {
 				if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
 				ggplot2::ggsave(paste0(save.name,".png"),plot=g.catch, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+				ggplot2::ggsave(paste0(save.name,".png"),plot=g.effort, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 				ggplot2::ggsave(paste0(save.name,".png"),plot=g.cpue, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 				ggplot2::ggsave(paste0(save.name,".png"),plot=g.ln_hist_time, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 				ggplot2::ggsave(paste0(save.name,".png"),plot=g.ln_hist, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
@@ -250,7 +269,7 @@
 			}
 		} 
 			
-		return(list(catch=g.catch,cpue=g.cpue,pen=g.pen,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
+		return(list(catch=g.catch,effort=g.effort,cpue=g.cpue,pen=g.pen,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
 			wt_hist_time=g.wt_hist_time,wt_hist=g.wt_hist,wt_heat=g.wt_heat))
 
 	}	
