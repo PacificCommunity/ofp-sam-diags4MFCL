@@ -92,12 +92,11 @@
 				ggplot2::geom_hline(yintercept=1) +
 				ggplot2::xlab("Year") +
 				ggplot2::ylab("CPUE") +
-				ggplot2::ggtitle("CPUE by fishery") +
-				ggplot2::geom_point(ggplot2::aes(x=ts,y=cpue),fill="gray70",size=2,shape=21)
+				ggplot2::ggtitle("CPUE by fishery")
 				if(length(unique(ifelse(cep.dt$penalty<0,NA,cep.dt$penalty)))>1)
 				{
 					g.cpue = g.cpue + ggplot2::geom_point(ggplot2::aes(x=ts,y=cpue,fill=penalty),size=2,shape=21) +
-									  ggplot2::scale_color_viridis_c("Penalty weight")
+									  ggplot2::scale_fill_viridis_c("Penalty weight")
 
 					g.pen = data.table::as.data.table(cateffpen(tmp.frq)) %>% .[,ts:=year+(month/12)+(week/48)] %>% .[,Region:=fishery.reg[fishery]] %>%
 					.[,Region := factor(as.character(Region),levels=as.character(sort(unique(Region))))] %>% .[,Fishery := factor(fdesc$name[fishery],levels=fdesc$name)] %>%
@@ -108,8 +107,8 @@
 					ggplot2::xlab("Year") +
 					ggplot2::ylab("CPUE") +
 					ggplot2::ggtitle("CPUE by fishery") +
-					ggplot2::geom_point(ggplot2::aes(x=ts,y=penalty),fill=penalty,size=2,shape=21) +
-					ggplot2::scale_color_viridis_c("Penalty weight")
+					ggplot2::geom_point(ggplot2::aes(x=ts,y=penalty,fill=penalty),size=2,shape=21) +
+					ggplot2::scale_fill_viridis_c("Penalty weight")
 
 					# write.out
 					if(!missing(save.dir))
@@ -123,6 +122,7 @@
 						}
 					} 
 				} else{
+					g.cpue = g.cpue + ggplot2::geom_point(ggplot2::aes(x=ts,y=cpue),fill="gray70",size=2,shape=21)
 					g.pen = NULL
 				}
 
