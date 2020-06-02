@@ -7,7 +7,7 @@
 plot.frqit(Frq.list, Frq.names = NULL, fdesc = NULL, save.dir, save.name)
 }
 \arguments{
-\item{Frq.list}{A list of Frq objects or a single Frq object. The reference model should be listed first.}
+\item{Frq.list}{A list of two Frq objects (for plotting difference) or a single Frq object. The reference model should be listed first.}
 
 \item{Frq.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
 
