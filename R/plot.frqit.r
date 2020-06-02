@@ -106,7 +106,7 @@
 					ggplot2::geom_hline(yintercept=0) +
 					ggplot2::xlab("Year") +
 					ggplot2::ylab("Catch") +
-					ggplot2::ggtitle("Model comparison - Catch") +
+					ggplot2::ggtitle("Model comparison - Length composition") +
 					ggplot2::geom_point(ggplot2::aes(x=ts,y=Length,color=model,size=N),alpha=0.5) + 
 					ggplot2::scale_color_manual("Model",values=c("blue","red"))
 
@@ -117,7 +117,7 @@
 					ggplot2::geom_hline(yintercept=0) +
 					ggplot2::xlab("Year") +
 					ggplot2::ylab("Catch") +
-					ggplot2::ggtitle("Model comparison - Catch") +
+					ggplot2::ggtitle("Model comparison - Weight composition") +
 					ggplot2::geom_point(ggplot2::aes(x=ts,y=Weight,color=model,size=N),alpha=0.5,shape=1) + 
 					ggplot2::scale_color_manual("Model",values=c("blue","red"))
 			
