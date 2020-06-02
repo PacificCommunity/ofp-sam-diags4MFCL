@@ -2,7 +2,7 @@
 
 #' Plot a frqit::frq object
 #' 
-#' @param Frq.list A list of Frq objects or a single Frq object. The reference model should be listed first.
+#' @param Frq.list A list of two Frq objects (for plotting difference) or a single Frq object. The reference model should be listed first.
 #' @param Frq.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
 #' @param fdesc A data.frame with 7 columns (num,gear_long,method,code,gear,flag,region) and n rows, where n is the number of defined fisheries.
 #' @param save.dir Path to the directory where the outputs will be saved
@@ -12,6 +12,9 @@
 #' @import magrittr
 #' @importFrom data.table as.data.table
 #' @importFrom data.table melt
+#' @importFrom data.table rbindlist
+#' @importFrom data.table dcast
+#' @importFrom data.table setnames
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 ggplot
@@ -37,17 +40,113 @@
 	  # Check and sanitise input Frq arguments and names
 	    frq.list = check.frqit.args(frq=Frq.list, frq.names=Frq.names)
 	    frq.names = names(frq.list)
-	  
-		if(length(frq.list)>1)
+
+
+		rainbow.cols = c("#f44336","#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#03a9f4","#00bcd4","#009688","#4caf50","#8bc34a","#cddc39","#ffeb3b","#ffc107","#ff9800")
+		tmp.fn = function(x,y){return(median(rep(x,round(ifelse(is.na(y),0,y))),na.rm=TRUE))}			
+
+
+
+		if(length(frq.list)>2)
 		{
 			dt.list = as.list(rep(NA,length(frq.list)))
 			names(dt.list) = names(frq.list)
-			stop("plot.frq is not defined for plotting multiple frq objects")
+			stop("plot.frq is not defined for plotting more than 2 frqit objects")
+		} else if (length(frq.list)==2){
+			catch.dt.list = as.list(rep(NA,length(frq.list)))
+			names(catch.dt.list) = names(frq.list)
+			ln.dt.list = as.list(rep(NA,length(frq.list)))
+			names(ln.dt.list) = names(frq.list)
+			wt.dt.list = as.list(rep(NA,length(frq.list)))
+			names(wt.dt.list) = names(frq.list)
+
+			# exctract data from each frq
+			for(i in 1:length(frq.list))
+			{
+				catch.dt.list[[i]] = data.table::as.data.table(cateffpen(frq.list[[i]])) %>% .[,model:=frq.names[i]]
+				ln.dt.list[[i]] = data.table::as.data.table(lnfrq(frq.list[[i]])) %>% .[,model:=frq.names[i]]
+				wt.dt.list[[i]] = data.table::as.data.table(wtfrq(frq.list[[i]])) %>% .[,model:=frq.names[i]]
+			}
+
+			g.catch_diff =  data.table::rbindlist(catch.dt.list) %>%
+					   .[,ts:=year+month/12] %>%
+					   ggplot2::ggplot() + ggthemes::theme_few() + 
+					   ggplot2::facet_wrap(~fishery,scales="free_y",drop=FALSE) +
+					   ggplot2::geom_hline(yintercept=0) +
+					   ggplot2::xlab("Year") +
+					   ggplot2::ylab("Catch") +
+					   ggplot2::ggtitle("Model comparison - Catch") +
+					   ggplot2::geom_line(ggplot2::aes(x=ts,y=catch,color=model),alpha=0.5) + 
+					   ggplot2::scale_color_manual("Model",values=c("blue","red"))
+			g.effort_diff =  data.table::rbindlist(catch.dt.list) %>%
+					   .[,ts:=year+month/12] %>%
+					   ggplot2::ggplot() + ggthemes::theme_few() + 
+					   ggplot2::facet_wrap(~fishery,scales="free_y",drop=FALSE) +
+					   ggplot2::geom_hline(yintercept=0) +
+					   ggplot2::xlab("Year") +
+					   ggplot2::ylab("Effort") +
+					   ggplot2::ggtitle("Model comparison - Effort") +
+					   ggplot2::geom_line(ggplot2::aes(x=ts,y=effort,color=model),alpha=0.5) + 
+					   ggplot2::scale_color_manual("Model",values=c("blue","red"))
+			g.penalty_diff =  data.table::rbindlist(catch.dt.list) %>%
+					   .[,ts:=year+month/12] %>%
+					   ggplot2::ggplot() + ggthemes::theme_few() + 
+					   ggplot2::facet_wrap(~fishery,scales="free_y",drop=FALSE) +
+					   ggplot2::geom_hline(yintercept=0) +
+					   ggplot2::xlab("Year") +
+					   ggplot2::ylab("Penalty") +
+					   ggplot2::ggtitle("Model comparison - Penalty") +
+					   ggplot2::geom_line(ggplot2::aes(x=ts,y=penalty,color=model),alpha=0.5) + 
+					   ggplot2::scale_color_manual("Model",values=c("blue","red"))
+
+			g.ln_diff = data.table::rbindlist(ln.dt.list) %>% .[,ts:=year+month/12] %>% data.table::melt(.,id.vars=c("ts","year","month","week","fishery","model"),variable.name = "Length",value.name="N") %>%
+					.[,Length:=as.numeric(as.character(Length))] %>% .[N>0] %>%
+				    ggplot2::ggplot() + ggthemes::theme_few() + 
+					ggplot2::facet_wrap(~fishery,scales="free_y",drop=FALSE) +
+					ggplot2::geom_hline(yintercept=0) +
+					ggplot2::xlab("Year") +
+					ggplot2::ylab("Catch") +
+					ggplot2::ggtitle("Model comparison - Length composition") +
+					ggplot2::geom_point(ggplot2::aes(x=ts,y=Length,color=model,size=N),alpha=0.5) + 
+					ggplot2::scale_color_manual("Model",values=c("blue","red"))
+
+			g.wt_diff = data.table::rbindlist(wt.dt.list) %>% .[,ts:=year+month/12] %>% data.table::melt(.,id.vars=c("ts","year","month","week","fishery","model"),variable.name = "Weight",value.name="N") %>%
+					.[,Weight:=as.numeric(as.character(Weight))] %>% .[N>0] %>%
+				    ggplot2::ggplot() + ggthemes::theme_few() + 
+					ggplot2::facet_wrap(~fishery,scales="free_y",drop=FALSE) +
+					ggplot2::geom_hline(yintercept=0) +
+					ggplot2::xlab("Year") +
+					ggplot2::ylab("Catch") +
+					ggplot2::ggtitle("Model comparison - Weight composition") +
+					ggplot2::geom_point(ggplot2::aes(x=ts,y=Weight,color=model,size=N),alpha=0.5,shape=1) + 
+					ggplot2::scale_color_manual("Model",values=c("blue","red"))
+			
+			# write.out
+			if(!missing(save.dir))
+			{
+				if(missing(save.name))
+				{
+					stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
+				} else {
+					if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
+					ggplot2::ggsave(paste0(save.name,".catch_diff.png"),plot=g.catch_diff, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".effort_diff.png"),plot=g.effort_diff, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".penalty_diff.png"),plot=g.penalty_diff, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".ln_diff.png"),plot=g.ln_diff, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".wt_diff.png"),plot=g.wt_diff, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+
+				}
+			} 
+				
+			return(list(catch_diff=g.catch_diff,effort_diff=g.effort_diff,penalty_diff=g.penalty_diff,ln_diff=g.ln_diff,wt_diff=g.wt_diff))
+
+
 		} else {
 			tmp.frq = frq.list[[1]]
 			tmp.name = names(frq.list)[1]
 
-			if(is.null(fdesc))
+			# define defaults
+		    if(is.null(fdesc))
 			{
 				fdesc = data.frame(num=1:n_fisheries(tmp.frq),gear_long=NA,method=NA,code=NA,gear=NA,flag=NA,region=c(aperm(region_fish(tmp.frq),c(3,1,2,4,5,6))))
 				fdesc$code = paste0(fdesc$num,".",fdesc$region)
@@ -55,10 +154,6 @@
 			} else {
 				fdesc$name = paste0(fdesc$num,": ",fdesc$code)
 			}
-
-			  rainbow.cols = c("#f44336","#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#03a9f4","#00bcd4","#009688","#4caf50","#8bc34a","#cddc39","#ffeb3b","#ffc107","#ff9800")
-			  tmp.fn = function(x,y){return(median(rep(x,round(ifelse(is.na(y),0,y))),na.rm=TRUE))}			
-
 
 			#____________________________________________________________________________________________________________
 			# Plot catch
@@ -242,34 +337,30 @@
 				ggplot2::geom_point(data=wt.dt[,.(med=tmp.fn(Weight,N)),by=.(ts,Fishery)],ggplot2::aes(x=ts,y=med),fill="hotpink",shape=21,size=1) +
 				ggplot2::scale_color_viridis_c("Proportion of observations",trans="logit")
 
+			# write.out
+			if(!missing(save.dir))
+			{
+				if(missing(save.name))
+				{
+					stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
+				} else {
+					if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
+					ggplot2::ggsave(paste0(save.name,".catch.png"),plot=g.catch, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".effort.png"),plot=g.effort, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".cpue.png"),plot=g.cpue, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".ln_hist_time.png"),plot=g.ln_hist_time, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".ln_hist.png"),plot=g.ln_hist, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".ln_heat.png"),plot=g.ln_heat, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".wt_hist_time.png"),plot=g.wt_hist_time, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".wt_hist.png"),plot=g.wt_hist, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+					ggplot2::ggsave(paste0(save.name,".wt_heat.png"),plot=g.wt_heat, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
+
+				}
+			} 
+				
+			return(list(catch=g.catch,effort=g.effort,cpue=g.cpue,pen=g.pen,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
+				wt_hist_time=g.wt_hist_time,wt_hist=g.wt_hist,wt_heat=g.wt_heat))
 			
 		}
-
-
-
-		
-		# write.out
-		if(!missing(save.dir))
-		{
-			if(missing(save.name))
-			{
-				stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
-			} else {
-				if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.catch, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.effort, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.cpue, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.ln_hist_time, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.ln_hist, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.ln_heat, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.wt_hist_time, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.wt_hist, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g.wt_heat, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
-
-			}
-		} 
-			
-		return(list(catch=g.catch,effort=g.effort,cpue=g.cpue,pen=g.pen,ln_hist_time=g.ln_hist_time,ln_hist=g.ln_hist,ln_heat=g.ln_heat,
-			wt_hist_time=g.wt_hist_time,wt_hist=g.wt_hist,wt_heat=g.wt_heat))
 
 	}	
