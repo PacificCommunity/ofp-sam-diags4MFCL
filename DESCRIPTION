@@ -15,6 +15,7 @@ RoxygenNote: 7.0.2
 Depends:
 	R (>= 3.5.1) 
 Imports:
+  FLCore,
 	FLR4MFCL,
     data.table,
     magrittr,
@@ -26,6 +27,7 @@ Suggests:
     roxygen2
 Remotes:
 	PacificCommunity/ofp-sam-flr4mfcl,
-  PacificCommunity/ofp-sam-frqit
+  PacificCommunity/ofp-sam-frqit,
+  flr/FLCore
 URL: https://github.com/PacificCommunity/ofp-sam-diags4MFCL
 BugReports: https://github.com/PacificCommunity/ofp-sam-diags4MFCL/issues
