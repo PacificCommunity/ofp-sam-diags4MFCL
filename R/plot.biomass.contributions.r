@@ -12,6 +12,7 @@
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
 #' @import FLR4MFCL
+#' @import FLCore
 #' @import magrittr
 #' @importFrom data.table setnames
 #' @importFrom data.table data.table
