@@ -27,7 +27,7 @@
 #' @importFrom ggplot2 scale_fill_manual
 #' 
 
-plot.biomass.contributions = function(par, rep, Fmult=0, proportion=TRUE, cols=NULL)
+plot.biomass.contributions = function(par, rep, Fmult=0, proportion=TRUE, cols=NULL,save.dir,save.name)
 {
   	#____________________________________________________________________________________________________________
   	# Legacy code from Rob Scott FLR4MFCL::plotting.r

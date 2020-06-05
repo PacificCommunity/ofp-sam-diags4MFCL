@@ -5,7 +5,15 @@
 \title{Plot the contributions to biomass from each region
 Original code from Rob Scott's FLR4MFCL package and refreshed for diags4mfcl}
 \usage{
-plot.biomass.contributions(par, rep, Fmult = 0, proportion = TRUE, cols = NULL)
+plot.biomass.contributions(
+  par,
+  rep,
+  Fmult = 0,
+  proportion = TRUE,
+  cols = NULL,
+  save.dir,
+  save.name
+)
 }
 \arguments{
 \item{par}{MFCLPar object}
