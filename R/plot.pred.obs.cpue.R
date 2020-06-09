@@ -103,7 +103,7 @@ plot.pred.obs.cpue <- function(frq = frq, par = par, fisheries, fishery_names, s
 			stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
 		} else {
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-			ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
+			ggplot2::ggsave(paste0(save.name,".png"),plot=p, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
 		}
 	} 
 		
