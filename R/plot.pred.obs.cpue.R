@@ -93,7 +93,6 @@ plot.pred.obs.cpue <- function(frq = frq, par = par, fisheries, fishery_names, s
   p <- p + ggthemes::theme_few()
   p <- p + ggplot2::xlab("Time") + ggplot2::ylab("Normalised CPUE")
   p <- p + ggplot2::theme(legend.position = "none")
-  p
 
 	# write.out
 	if(!missing(save.dir))
