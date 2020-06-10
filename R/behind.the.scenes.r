@@ -1,6 +1,26 @@
 # Behind the scenes the functions
 # Some are internal only and are not exposed to the user
 
+
+# Internal function for saving plots
+# To save including in every plot function
+save_plot <- function(save.dir, save.name, plot, width = 9, height = 9){
+	# write.out
+	if(!missing(save.dir))
+	{
+		if(missing(save.name))
+		{
+			stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
+		} else {
+			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
+			ggplot2::ggsave(paste0(save.name,".png"),plot=plot, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
+		}
+	} 
+  return(NULL)
+}
+		
+
+
 # Internal function for checking the MFCLRep arguments
 # Substitute for doing S4 methods
 check.rep.args <- function(rep, rep.names=NULL){
@@ -36,6 +56,25 @@ check.rep.args <- function(rep, rep.names=NULL){
   }
   return(rep)
 }
+## Some tests - could be added to unit tests if needed
+#rep1 <- MFCLRep()
+#rep2 <- MFCLRep()
+#rep3 <- MFCLRep()
+#par1 <- MFCLPar()
+#
+#rep_list_named <- list(rep1=rep1, rep2=rep2, rep3=rep3)
+#rep_list_unnamed <- list(rep1, rep2, rep3)
+#fake_list <- list(1,2,3)
+#fake_list2 <- list(rep1,2,3)
+#      
+#check.rep.args(rep=fake_list) # Should fail
+#check.rep.args(rep=fake_list2) # Should fail
+#check.rep.args(rep=par1) # Should fail
+#check.rep.args(rep=rep1)
+#check.rep.args(rep=rep1, rep.names="Bob") # Should be OK
+#check.rep.args(rep=rep1, rep.names=c("Bob","Carol")) # Should fail
+#check.rep.args(rep=rep_list_unnamed, rep.names=c("Bob","Carol","Ted"))
+#check.rep.args(rep=rep_list_named)
 
 check.frqit.args <- function(frq, frq.names=NULL){
   bad_argument_types_message <- "The function is expecting a Frq object from the frqit package, or a list of Frq objects."
@@ -72,25 +111,6 @@ check.frqit.args <- function(frq, frq.names=NULL){
 }
       
 
-## Some tests - could be added to unit tests if needed
-#rep1 <- MFCLRep()
-#rep2 <- MFCLRep()
-#rep3 <- MFCLRep()
-#par1 <- MFCLPar()
-#
-#rep_list_named <- list(rep1=rep1, rep2=rep2, rep3=rep3)
-#rep_list_unnamed <- list(rep1, rep2, rep3)
-#fake_list <- list(1,2,3)
-#fake_list2 <- list(rep1,2,3)
-#      
-#check.rep.args(rep=fake_list) # Should fail
-#check.rep.args(rep=fake_list2) # Should fail
-#check.rep.args(rep=par1) # Should fail
-#check.rep.args(rep=rep1)
-#check.rep.args(rep=rep1, rep.names="Bob") # Should be OK
-#check.rep.args(rep=rep1, rep.names=c("Bob","Carol")) # Should fail
-#check.rep.args(rep=rep_list_unnamed, rep.names=c("Bob","Carol","Ted"))
-#check.rep.args(rep=rep_list_named)
 
 # Palette functions - these can be passed into the plotting function to set the palette.
 # The two name arguments are important because if you are only plotting a subset of the models

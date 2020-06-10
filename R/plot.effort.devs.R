@@ -81,17 +81,7 @@ plot.effort.devs <- function(frq, par, fisheries, fishery_names, save.dir, save.
   p <- p + ggthemes::theme_few()
   p <- p + ggplot2::xlab("Time") + ggplot2::ylab("Effort deviation")
   
-	# write.out
-	if(!missing(save.dir))
-	{
-		if(missing(save.name))
-		{
-			stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
-		} else {
-			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-			ggplot2::ggsave(paste0(save.name,".png"),plot=p, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
-		}
-	} 
-		
+  save_plot(save.dir, save.name, plot=p)
+  
 	return(p)
 }
