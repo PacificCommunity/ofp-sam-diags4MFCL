@@ -66,55 +66,65 @@ plot.srr <- function(rep.list, rep.names=NULL, palette.func=default.model.colour
   return(p)
 }
 
-# Plot recruitment distributions across the models
-plot.rec.dist <- function(rep.list, rep.names=NULL, palette.func=default.model.colours, save.dir, save.name, ...){
+#' Plot recruitment distribution proprotions
+#' 
+#' Plot distribution of proportion of total recruitment (averaged over year range) between quarters and regions across models.
+#' @param rep.list A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
+#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param year_range The year range to average the total recruitment over. Default is the last 10 years.
+#' @param plot_type Can be "violin" for a violin plot or "box" for a boxplot. The default is boxplot.
+#' @param overlay_data Do you want to overlay the original data on the distribution? TRUE or FALSE (default).
+#' @param palette.func A function to determine the colours of each area. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
+#' @param save.dir Path to the directory where the outputs will be saved
+#' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
+#' @export
+#' @import FLR4MFCL
+#' @import magrittr
+#' @importFrom ggplot2 geom_boxplot
+#' @importFrom ggplot2 geom_violin
+plot.rec.dist <- function(rep.list, rep.names=NULL, year_range = (as.numeric(range(rep.list[[1]])["maxyear"])-9):as.numeric(range(rep.list[[1]])["maxyear"]), plot_type="violin", overlay_data=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)
   
-  
-  rec_dist  <- rbind(rec_dist,   c(yearMeans(trim(seasonSums(popN(reps[[rr]])[1,]), year=1982:2018)))/sum(yearMeans(trim(seasonSums(popN(reps[[rr]])[1,]), year=1982:2018))))
-#  rec_dist_q<- rbind(rec_dist_q, c(yearMeans(trim(popN(reps[[rr]])[1,], year=1982:2018)))/sum(yearMeans(trim(seasonSums(popN(reps[[rr]])[1,]), year=1982:2018))))
-  
-year_range <- 1982:2018  
-  
-  rec_dist <- lapply(rep.list, function(x){
-    out <- c(yearMeans(trim(seasonSums(popN(x)[1,]), year=year_range))) / sum(yearMeans(trim(seasonSums(popN(x)[1,]), year=year_range)))
+  dat <- lapply(rep.list, function(x){
+    out <- as.data.frame(yearMeans(popN(x)[1,ac(year_range)]))
+    out$total_rec  <- c(areaSums(seasonSums(yearMeans(popN(x)[1,ac(year_range)]))))
+    out$prop_rec <- out$data / out$total_rec
     return(out)
+    }
+  )
+  dat <- do.call("rbind", dat)
+  # Tidy up data
+  dat$model <- rep(rep.names, each=dim(dat)[1] / length(rep.names))
+  no_seasons <- length(unique(dat$season))
+  no_areas <- length(unique(dat$area))
+  dat$area_name <- paste("Region ", dat$area, sep="")
+  
+  # And plot
+  # Colour by area - not sure it's a great idea
+  colour_values <- palette.func(selected.model.names = unique(dat$area_name), ...)
+  p <- ggplot2::ggplot(dat, ggplot2::aes(x=season, y=prop_rec))
+  if(plot_type=="violin"){
+    p <- p + ggplot2::geom_violin(aes(fill=area_name))
   }
-  
-  rec_dist_q<- lapply(rep.list, function(x){
-    out <-  c(yearMeans(trim(popN(x)[1,], year=year_range)))/sum(yearMeans(trim(seasonSums(popN(x)[1,]), year=year_range)))
-    return(out)
+  else {
+    p <- p + ggplot2::geom_boxplot(aes(fill=area_name))
   }
-
-
-)
+  if (overlay_data){
+    p <- p + ggplot2::geom_point(alpha=0.25) # Maybe overlay the original data?
+  }
+  p <- p + ggplot2::facet_wrap(~area_name, ncol = no_areas)
+  p <- p + ggplot2::xlab("Quarter") + ggplot2::ylab("Proportion of total recruitment")
+  p <- p + ggthemes::theme_few()
+  p <- p + ggplot2::theme(legend.position = "none") 
+	p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
   
+  save_plot(save.dir, save.name, plot=p)
   
-
-
-
-#rec_dist <- rec_dist_q <- NULL
-#for(rr in 1:length(runnames2)){
-#  rec_dist  <- rbind(rec_dist,   c(yearMeans(trim(seasonSums(popN(reps[[rr]])[1,]), year=1982:2018)))/sum(yearMeans(trim(seasonSums(popN(reps[[rr]])[1,]), year=1982:2018))))
-#  rec_dist_q<- rbind(rec_dist_q, c(yearMeans(trim(popN(reps[[rr]])[1,], year=1982:2018)))/sum(yearMeans(trim(seasonSums(popN(reps[[rr]])[1,]), year=1982:2018))))
-#}
-#rec_dist.df   <- data.frame(run=runnames2, region=rep(1:8, each=length(runnames2)), propn=c(rec_dist))
-#rec_dist_q.df <- data.frame(run=runnames2, region=rep(1:8, each=length(runnames2)*4), qtr=rep(1:4, each=length(runnames2)), propn=c(rec_dist_q))
-#rec_dist_q.df$id <- paste(rec_dist_q.df$region, rec_dist_q.df$qtr, sep="_")
-#
-#qtrlySRRrep <- reps[[1]]
-#qtrlySRR_red_dist <- c(yearMeans(trim(popN(qtrlySRRrep)[1,], year=1982:2015)))/sum(yearMeans(trim(seasonSums(popN(qtrlySRRrep)[1,]), year=1982:2015)))
-#
-#png("/home/rob/MSE/ofp-sam-skipjack_MSE/reports/OM_cond/2019/figures/srr_distbn.png", width=800, height=600)
-#boxplot(propn~id, data=rec_dist_q.df, col=rep(c("burlywood", "cornsilk", "bisque3", "beige", "cornsilk3","seashell2","wheat4","khaki3"), each=4),
-#        names=rep(as.character(1:4), 8), xlab="Quarter", ylab="Proportion of Total Recruitment")
-#abline(v=0.5+seq(4,length=7, by=4), col="grey")
-#
-##segments(seq(0.5,31.5), qtrlySRR_red_dist, seq(1.5, 32.5), qtrlySRR_red_dist, col="red", lwd=2)
-#mtext(paste("Region", 1:8), side=3, line=1, at=c(2.5, 6.5, 10.5, 14.5, 18.5, 22.5, 26.5, 30.5))
-#dev.off()
+  return(p)
+}
 
 
 
