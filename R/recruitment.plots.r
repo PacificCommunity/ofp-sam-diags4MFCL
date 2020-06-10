@@ -126,6 +126,39 @@ plot.rec.dist <- function(rep.list, rep.names=NULL, year_range = (as.numeric(ran
   return(p)
 }
 
+#' Plot estimated recruitment deviates
+#' 
+#' Plot estimated recruitment deviates for a single model, by quarter and region.
+#' A loess smoothed fit is shown.
+#' @param par An object of MFCLPar that contains the effort deviations.
+#' @param save.dir Path to the directory where the outputs will be saved
+#' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @export
+#' @import FLR4MFCL
+#' @import magrittr
+#' @importFrom ggplot2 scale_x_continuous
+plot.rec.devs <- function(par, save.dir, save.name){
+  if (class(par) != "MFCLPar"){
+    stop("par argument must of type of type 'MFCLPar'.")
+  }
+  pdat <- as.data.frame(region_rec_var(par))
+  pdat$area_name <- paste("Region ", pdat$area, sep="")
+  pdat$season_name <- paste("Quarter ", pdat$season, sep="")
+  
+  year_axis_breaks <- seq(10*floor(min(pdat$year)/10), 10*ceiling(max(pdat$year)/10) , 20)
+  p <- ggplot2::ggplot(pdat, ggplot2::aes(x=year, y=data))
+  p <- p + ggplot2::geom_point()
+  p <- p + ggplot2::facet_grid(season_name ~ area_name, scales="free")
+  p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE)
+  p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
+  p <- p + ggplot2::xlab("Year") + ggplot2::ylab("Recruitment deviate")
+  p <- p + ggplot2::scale_x_continuous(breaks=year_axis_breaks) 
+  p <- p + ggthemes::theme_few()
+  
+  save_plot(save.dir, save.name, plot=p)
+  
+	return(p)
+}
 
 
 
