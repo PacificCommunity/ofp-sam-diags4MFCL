@@ -74,7 +74,7 @@ plot.effort.devs <- function(frq, par, fisheries, fishery_names, save.dir, save.
   
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=edev))
   p <- p + ggplot2::geom_point(na.rm=TRUE)
-  p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE)
+  p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
   p <- p + ggplot2::facet_wrap(~fishery_names)
   p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
   p <- p + ggplot2::ylim(c(-ymax,ymax))
