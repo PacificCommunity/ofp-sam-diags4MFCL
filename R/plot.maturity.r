@@ -34,10 +34,10 @@ plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legen
     par.names <- names(pars)
 
     if (Length) {
-        if(missing(LBins)) stop("You need to supply the length bins to serve as the x-axis")
+        if(missing(LnBins)) stop("You need to supply the length bins (LnBins) to serve as the x-axis")
         dat <-  lapply(1:length(pars), function(x){
             mat=mat_at_length(pars[[x]])
-            if(length(LnBins)!=length(mat)) stop("The length of Lbins does not match the length of the maturity at length")
+            if(length(LnBins)!=length(mat)) stop("The length of Lnbins does not match the length of the maturity at length")
             dat=data.frame(var=LnBins,mat=mat,model=par.names[x])
             return(dat)
         })
