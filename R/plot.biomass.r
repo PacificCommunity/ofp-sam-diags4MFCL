@@ -165,7 +165,6 @@ plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRU
 				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region,scales="free_y") +
 				ggplot2::xlab("Year") +
 				ggplot2::ggtitle(paste0("Estimated biomass (",formatC(biomass.units, format="f", big.mark=",", digits=0),"s mt) - ",mlab)) +
-				ggplot2::scale_y_continuous(name=ylab,breaks = pretty,limits=c(0,max(plot.dt$bio))) +
 				ggplot2::geom_line(ggplot2::aes(x=time,y=bio,color=model),size=1.25) +
 				ggplot2::scale_color_manual("Model",values=colour_values)
 			} else {
