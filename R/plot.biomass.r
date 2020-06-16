@@ -8,6 +8,7 @@
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param biomass.type Character string denoting the type of biomass plotted, 'SSB' or 'Total'
 #' @param biomass.units Integer number denoting how many MT to divide the biomass by. Default is 1000.
+#' @param yaxis.free TRUE or FALSE. Default is FALSE. If TRUE and agg.regions is also TRUE than the y-axis scales will be independent across regions, otherwise they will be shared so regional scaling will be apparent.  
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
@@ -29,7 +30,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",biomass.units = 1000, palette.func=default.model.colours, save.dir, save.name, ...)
+plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",biomass.units = 1000,yaxis.free=FALSE, palette.func=default.model.colours, save.dir, save.name, ...)
 {
 	  # Check and sanitise input MFCLRep arguments and names
     rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
@@ -158,14 +159,25 @@ plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRU
 		# make plot
 			# Get the colours - if all.model.names passed in using ... then it is passed to palette func
 			colour_values <- palette.func(selected.model.names = names(rep.list), ...)
-			g = plot.dt %>% 
-			ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region) +
-			ggplot2::xlab("Year") +
-			ggplot2::ggtitle(paste0("Estimated biomass (",formatC(biomass.units, format="f", big.mark=",", digits=0),"s mt) - ",mlab)) +
-			ggplot2::scale_y_continuous(name=ylab,breaks = pretty,limits=c(0,max(plot.dt$bio))) +
-			ggplot2::geom_line(ggplot2::aes(x=time,y=bio,color=model),size=1.25) +
-			ggplot2::scale_color_manual("Model",values=colour_values)
-		
+			if(yaxis.free)
+			{
+				g = plot.dt %>% 
+				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region,scales="free_y") +
+				ggplot2::xlab("Year") +
+				ggplot2::ggtitle(paste0("Estimated biomass (",formatC(biomass.units, format="f", big.mark=",", digits=0),"s mt) - ",mlab)) +
+				ggplot2::scale_y_continuous(name=ylab,breaks = pretty,limits=c(0,max(plot.dt$bio))) +
+				ggplot2::geom_line(ggplot2::aes(x=time,y=bio,color=model),size=1.25) +
+				ggplot2::scale_color_manual("Model",values=colour_values)
+			} else {
+				g = plot.dt %>% 
+				ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region) +
+				ggplot2::xlab("Year") +
+				ggplot2::ggtitle(paste0("Estimated biomass (",formatC(biomass.units, format="f", big.mark=",", digits=0),"s mt) - ",mlab)) +
+				ggplot2::scale_y_continuous(name=ylab,breaks = pretty,limits=c(0,max(plot.dt$bio))) +
+				ggplot2::geom_line(ggplot2::aes(x=time,y=bio,color=model),size=1.25) +
+				ggplot2::scale_color_manual("Model",values=colour_values)
+			}
+
 
 		# write.out
 		if(!missing(save.dir))
