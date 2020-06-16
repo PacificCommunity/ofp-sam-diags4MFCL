@@ -42,8 +42,8 @@ plot.movement.matrix = function(pars,par.names,age.vec,season.vec,save.dir,save.
 				move.coef.1 = move.coef.1[,.(value=mean(value)),by=.(from,to)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 				move.coef.2 = move.coef.2[,.(value=mean(value)),by=.(from,to)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 			} else {
-				move.coef.1 = move.coef.1[,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
-				move.coef.2 = move.coef.2[,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
+				move.coef.1 = move.coef.1[period %in%season.vec,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
+				move.coef.2 = move.coef.2[period %in%season.vec,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
 			}
 		} else {
 			if(missing(season.vec))
@@ -51,8 +51,8 @@ plot.movement.matrix = function(pars,par.names,age.vec,season.vec,save.dir,save.
 				move.coef.1 = move.coef.1[age %in%age.vec,.(value=mean(value)),by=.(from,to,age)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 				move.coef.2 = move.coef.2[age %in%age.vec,.(value=mean(value)),by=.(from,to,age)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 			} else {
-				move.coef.1 = move.coef.1[age %in%age.vec,.(value=mean(value)),by=.(from,to,age,period)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
-				move.coef.2 = move.coef.2[age %in%age.vec,.(value=mean(value)),by=.(from,to,age,period)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
+				move.coef.1 = move.coef.1[period %in%season.vec & age %in%age.vec,.(value=mean(value)),by=.(from,to,age,period)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
+				move.coef.2 = move.coef.2[period %in%season.vec & age %in%age.vec,.(value=mean(value)),by=.(from,to,age,period)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
 			}
 		}
 
@@ -72,14 +72,14 @@ plot.movement.matrix = function(pars,par.names,age.vec,season.vec,save.dir,save.
 			{
 				move.coef = move.coef[,.(value=mean(value)),by=.(from,to)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 			} else {
-				move.coef = move.coef[,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
+				move.coef = move.coef[period %in%season.vec,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
 			}
 		} else {
 			if(missing(season.vec))
 			{
 				move.coef = move.coef[age %in%age.vec,.(value=mean(value)),by=.(from,to,age)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 			} else {
-				move.coef = move.coef[age %in%age.vec,.(value=mean(value)),by=.(from,to,age,period)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
+				move.coef = move.coef[period %in%season.vec & age %in%age.vec,.(value=mean(value)),by=.(from,to,age,period)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
 			}
 		}
 
