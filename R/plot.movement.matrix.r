@@ -94,7 +94,17 @@ plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,
 
 	
 
-			save_plot(save.dir, save.name, plot=g, width = 16, height = 9)
-
+	# write.out
+		if(!missing(save.dir))
+		{
+			if(missing(save.name))
+			{
+				stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
+			} else {
+				if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
+				ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
+			}
+		} 
+		
     return(g)
 }
