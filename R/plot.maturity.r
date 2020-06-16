@@ -5,23 +5,31 @@
 #'
 #' Plots the natural mortality by length bin or age class for each mode
 #' @param pars a list of MFCLPar objects or a single MFCLPar object. The reference model should be the first in the list.
-#' @param rep.names an optional vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param par.names an optional vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the par.list (if available) or generated automatically.
 #' @param Length a boolean to determine whether to plot maturity at age (default) or maturity at length
-#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param LnBins a vector of length bin values
+#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
+#' @param xlab Name to display on the x axis label
+#' @param ylab Name to display on the y axis label
+#' @param LegLon legend location if show.legen is TRUE
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
-#' @param ylab Name to display on the y axis label
-#' @param xlab Name to display on the x axis label
-#' @param LegLon legend location if show.legen is TRUE
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-#'
+#' @importFrom ggthemes theme_few
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 xlab
+#' @importFrom ggplot2 ylab
+#' @importFrom ggplot2 ylim
+#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 scale_color_manual
+#' @importFrom ggplot2 theme
 
-plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name ,ylab="Reproductive output", xlab="Age (quarters)", LegLoc="bottomright", ...){
+plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legend=TRUE, palette.func=default.model.colours , xlab="Age (quarters)",ylab="Reproductive output", LegLoc="bottomright",save.dir, save.name, ...){
     pars <- check.par.args(par=pars, par.names=par.names)
     par.names <- names(pars)
 
