@@ -24,7 +24,7 @@
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 xlab
 #' @importFrom ggplot2 ylab
-#' @importFrom ggplot2 ylim
+#' @importFrom ggplot2 coord_cartesian
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 scale_color_manual
 #' @importFrom ggplot2 theme
@@ -55,7 +55,7 @@ plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legen
     p <- p + ggplot2::geom_line(ggplot2::aes(colour=model))
     p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
     p <- p + ggplot2::xlab(xlab) + ggplot2::ylab(ylab)
-    p <- p + ggplot2::ylim(c(0,1.2))
+    p <- p + ggplot2::coord_cartesian(ylim=c(0,1.05))
     p <- p + ggthemes::theme_few()
     if(show.legend==FALSE){
         p <- p + ggplot2::theme(legend.position = "none")
