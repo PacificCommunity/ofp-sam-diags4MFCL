@@ -171,3 +171,61 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, save.
   return(p)
 }
 
+# Look at return rate by region
+# By month of recapture
+#recap_reg <- aggregate(list(recap.pred=tagdat$recap.pred, recap.obs=tagdat$recap.obs),
+#  list(rel.region = tagdat$rel.region, recap.region=tagdat$recap.region, recap.month=tagdat$recap.month),
+#  sum, na.rm=TRUE)
+#
+#recap_reg_sum <- aggregate(list(recap.pred.sum = tagdat$recap.pred, recap.obs.sum = tagdat$recap.obs),
+#  list(rel.region = tagdat$rel.region, recap.month = tagdat$recap.month),
+#  sum, na.rm=TRUE)
+#
+#recap_reg <- merge(recap_reg, recap_reg_sum)
+#recap_reg$pred.prop <- recap_reg$recap.pred / recap_reg$recap.pred.sum
+#recap_reg$obs.prop <- recap_reg$recap.obs/ recap_reg$recap.obs.sum
+#
+## Check that this is same as Matt's
+## Total released from 1 that were recaught in 1 quarter
+#subset(recap_reg_sum, recap.month==2 & rel.region==1)
+#subset(recap_reg, recap.month==2 & rel.region==1)
+#
+## This would look like Matt's if finished
+#p <- ggplot(recap_reg, aes(x=rel.region, y=recap.region))
+#p <- p + geom_raster(aes(fill=obs.prop))
+#p <- p + facet_wrap(~recap.month)
+#p
+#
+## Plot of the difference between predicted and observed proportion of tags returned by region of release
+#recap_reg$diff.prop <- recap_reg$pred.prop - recap_reg$obs.prop
+#recap_reg$diff.prop2 <- log(recap_reg$pred.prop / recap_reg$obs.prop)
+#recap_reg$rel.region.name <- paste("Release region ", recap_reg$rel.region, sep="")
+#recap_reg$Quarter <- as.factor((recap_reg$recap.month+1) / 3)
+#
+#p <- ggplot(recap_reg, aes(x=as.factor(recap.region), y=diff.prop))
+#p <- p + geom_point(aes(colour = Quarter), size=4)
+#p <- p + facet_wrap(~rel.region.name, ncol=2, scales="free")
+#p <- p + geom_hline(aes(yintercept=0.0), linetype=2)
+#p <- p + ggthemes::theme_few()
+#p <- p + xlab("Recapture region")
+#p <- p + ylab("Predicted proportion - observed proportion")
+#p
+#
+## Plot of the difference between predicted and observed proportion of tags returned by region of release
+## As bars?
+#p <- ggplot(recap_reg, aes(x=as.factor(recap.region), y=diff.prop))
+#p <- p + geom_bar(stat="identity", aes(fill = Quarter), colour="black", position=position_dodge())
+#p <- p + facet_wrap(~rel.region.name, ncol=2, scales="free")
+#p <- p + xlab("Recapture region")
+#p <- p + geom_hline(aes(yintercept=0.0))
+#p <- p + ylab("Predicted proportion - observed proportion")
+#p <- p + ggthemes::theme_few()
+#p
+
+
+
+
+
+
+
+
