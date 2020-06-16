@@ -26,7 +26,7 @@ plot.comparisons = function(plot.name,rep.list,model.names,agg.years = TRUE,agg.
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
 			g1 = plot.depletion(rep.list,model.names,agg.years,agg.regions,biomass.type,palette.func,save.dir,save.name=paste0("dep-",save.name),...)
 			g2 = plot.biomass(rep.list,model.names,agg.years,agg.regions,biomass.type,biomass.units,yaxis.free,palette.func,save.dir,save.name=paste0("bio-",save.name),...)
-			g3 = plot.selectivity(rep.list,model.names,sel.basis,palette.func,fisheries=max(sapply(rep.list,function(x)dimensions(x)["fisheries"])),save.dir,save.name=paste0("sel-",tolower(sel.basis),"-",save.name),...)
+			g3 = plot.selectivity(rep.list,model.names,sel.basis,palette.func,fisheries=1:max(sapply(rep.list,function(x)dimensions(x)["fisheries"])),save.dir,save.name=paste0("sel-",tolower(sel.basis),"-",save.name),...)
 			g4 = plot.growth(rep.list,model.names,palette.func,save.dir,save.name=paste0("gro-",save.name),...)
 		}
 	} else {
