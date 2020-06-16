@@ -170,3 +170,39 @@ rainbow.model.colours <- function(selected.model.names, all.model.names=selected
   out <- out[selected.model.names]
   return(out)
 }
+
+# Internal function for checking the MFCLPar arguments
+# Substitute for doing S4 methods
+check.par.args <- function(par, par.names=NULL){
+  bad_argument_types_message <- "The function is expecting an MFCLPar object, or a list of MFCLPar objects."
+  # If just a single MFCLPar coerce to an unamed list
+  if (class(par) == "MFCLPar"){
+    par <- list(par)
+  }
+  # If it is a list, check that all elements are an MFCLPar object, otherwise fail
+  if (class(par) == "list"){
+    if(!all(lapply(par, class)=="MFCLPar")){
+      stop(bad_argument_types_message)
+    }
+  }
+  # If it's not a list of MFCLPar objects, fail
+  else {
+      stop(bad_argument_types_message)
+  }
+
+  # At this point par is a list of MFCLPar objects
+  # If par.names is supplied, then name the list - overwriting any existing names
+  if (!is.null(par.names)){
+    # Check length of par.names matches length of list
+    if(length(par.names)!=length(par)){
+      stop("Length of par.names must match the number of MFCLPar objects.")
+    }
+    names(par) <- par.names
+  }
+  # If there are still no names, make some up
+  if(is.null(names(par))){
+     fake_names <- paste("Model", seq(from=1, to=length(par)), sep="")
+     names(par) <- fake_names
+  }
+  return(par)
+}

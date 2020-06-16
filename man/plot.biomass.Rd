@@ -10,6 +10,8 @@ plot.biomass(
   agg.years = TRUE,
   agg.regions = TRUE,
   biomass.type = "SSB",
+  biomass.units = 1000,
+  yaxis.free = FALSE,
   palette.func = default.model.colours,
   save.dir,
   save.name,
@@ -26,6 +28,10 @@ plot.biomass(
 \item{agg.regions}{TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.}
 
 \item{biomass.type}{Character string denoting the type of biomass plotted, 'SSB' or 'Total'}
+
+\item{biomass.units}{Integer number denoting how many MT to divide the biomass by. Default is 1000.}
+
+\item{yaxis.free}{TRUE or FALSE. Default is FALSE. If TRUE and agg.regions is also TRUE than the y-axis scales will be independent across regions, otherwise they will be shared so regional scaling will be apparent.}
 
 \item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
 
