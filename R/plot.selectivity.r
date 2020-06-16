@@ -69,7 +69,7 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 			plot.dt = data.table::rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
 			
 		# only plot fisheries that are in the provided vector (if provided)
-			if(!is.missing(fisheries))
+			if(!missing(fisheries))
 			{
 				plot.dt = plot.dt[fishery %in% fisheries]
 			}
