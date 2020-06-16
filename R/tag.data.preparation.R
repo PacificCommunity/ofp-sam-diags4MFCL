@@ -28,10 +28,11 @@ tag.data.preparation <- function(tagrep, tagobs, par, fishery.map){
   tag_releases$mixing_period <- flagval(par, (-10000 - tag_releases$rel.group + 1),1)$value
   tagrep$mixing_period <- tag_releases$mixing_period[tagrep$rel.group]
   
-  # Also need the release dates
+  # Also need the release dates and numbers
   # Could sum over length to get total release numbers by release event
-  releases <- unique(releases(tagobs)[,c("program","rel.group","region","year","month")])
-  setnames(releases, c("program", "rel.group", "rel.region", "rel.year", "rel.month"))
+  releases <- aggregate(list(rel.obs = releases(tagobs)$lendist),
+    list(program=releases(tagobs)$program, rel.group=releases(tagobs)$rel.group, rel.region=releases(tagobs)$region, rel.year=releases(tagobs)$year, rel.month=releases(tagobs)$month),
+  sum, na.rm=TRUE)
   tagdat <- merge(tagrep, releases, all=TRUE)
   
   # Sort out the release and recapture timestep
@@ -46,7 +47,11 @@ tag.data.preparation <- function(tagrep, tagobs, par, fishery.map){
   # Argument to recovery plot is therefore vector of groups
   # Bring in recapture groups
   colnames(fishery.map)[colnames(fishery.map) == "fishery"] <- "recap.fishery"
-  tagdat <- merge(tagdat, fishery.map[,c("recap.fishery", "tag_recapture_group", "tag_recapture_name")])
+  colnames(fishery.map)[colnames(fishery.map) == "region"] <- "recap.region"
+  tagdat <- merge(tagdat, fishery.map[,c("recap.fishery", "recap.region", "tag_recapture_group", "tag_recapture_name")])
+  
+  # Reorder for friendliness back in calling function
+  tagdat <- tagdat[order(tagdat$rel.group, tagdat$rel.ts),]
   
   return(tagdat)
 }
