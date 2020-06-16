@@ -4,7 +4,14 @@
 \alias{plot.movement.matrix}
 \title{Plot the movement esimated movement for a single MFCLPar or the difference in the estimated movements for two pars with the same spatial, seasonal, age structure.}
 \usage{
-plot.movement.matrix(pars, par.names, age.vec, season.vec, save.dir, save.name)
+plot.movement.matrix(
+  pars,
+  par.names = NULL,
+  age.vec,
+  season.vec,
+  save.dir,
+  save.name
+)
 }
 \arguments{
 \item{pars}{a list of two MFCLPar objects or a single MFCLPar object. The reference model should be the first in the list.}

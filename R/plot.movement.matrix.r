@@ -24,7 +24,7 @@
 #' @importFrom ggplot2 scale_fill_gradient2
 #' 
 
-plot.movement.matrix = function(pars,par.names,age.vec,season.vec,save.dir,save.name)
+plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,save.name)
 {
 	pars = check.par.args(par=pars, par.names=par.names)
     par.names = names(pars)
