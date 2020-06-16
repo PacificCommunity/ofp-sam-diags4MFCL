@@ -44,6 +44,7 @@ plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, save
   # observations, even if NA.
   # This is a right pain in the bum - must be an easier way
   # Need to pad out time series
+  no_seasons <- length(unique(tagdat$recap.month)) # this is unsafe, how best to get no seasons?
   padts <- expand.grid(recap.ts = seq(from=min(pdat$recap.ts), to=max(pdat$recap.ts), by= 1 / no_seasons), tag_recapture_group = sort(unique(pdat$tag_recapture_group)))
   # Bring in the recapture group name
   padts <- merge(padts, unique(pdat[,c("tag_recapture_group","tag_recapture_name")]))
