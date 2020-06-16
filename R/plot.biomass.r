@@ -7,6 +7,7 @@
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param biomass.type Character string denoting the type of biomass plotted, 'SSB' or 'Total'
+#' @param biomass.units Integer number denoting how many MT to divide the biomass by. Default is 1000.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
@@ -28,7 +29,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", palette.func=default.model.colours, save.dir, save.name, ...)
+plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",biomass.units = 1000, palette.func=default.model.colours, save.dir, save.name, ...)
 {
 	  # Check and sanitise input MFCLRep arguments and names
     rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
@@ -43,25 +44,108 @@ plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRU
 			tmp.name = names(rep.list)[i]
 			if(agg.years)
 			{
+				mlab = "Annual"
 				if(agg.regions)
 				{
 					if(biomass.type == "SSB")
 					{
-						ylab = "Spawning potential"
+						ylab = "Spawning Potential"
 						tmp.bio.array = adultBiomass(tmp.rep)@.Data[1,,1,,,1]
-						tmp.bio = apply(tmp.bio.array,1,function(x)sum(colMeans(x)))/1000
-						dt.list[[i]] = data.table::data.table(time=as.numeric(names(tmp.bio)),bio=tmp.bio,model=rep(tmp.name,length(tmp.bio)),region=rep("All regions",length(tmp.bio)))
-						rm(list=c("tmp.bio","tmp.bio.array"))
+						tmp.bio = apply(tmp.bio.array,1,function(x)sum(colMeans(x)))/biomass.units
+						tmp.bio_nf.array = adultBiomass_nofish(tmp.rep)@.Data[1,,1,,,1]
+						tmp.bio_nf = apply(tmp.bio_nf.array,1,function(x)sum(colMeans(x)))/biomass.units
+						dt.list[[i]] = data.table::data.table(time=as.numeric(names(tmp.bio)),bio=tmp.bio,bio_nf=tmp.bio_nf,dep=tmp.bio/tmp.bio_nf,model=rep(tmp.name,length(tmp.bio)),region=rep("All regions",length(tmp.bio)))
+						rm(list=c("tmp.bio","tmp.bio.array","tmp.bio_nf","tmp.bio_nf.array"))
 					} else if(biomass.type == "Total"){
-						stop("Invalid biomass.type. Option for 'Total' hasn't been developed yet")
+						ylab = "Total Biomass"
+						tmp.bio.array = totalBiomass(tmp.rep)@.Data[1,,1,,,1]
+						tmp.bio = apply(tmp.bio.array,1,function(x)sum(colMeans(x)))/biomass.units
+						tmp.bio_nf.array = totalBiomass_nofish(tmp.rep)@.Data[1,,1,,,1]
+						tmp.bio_nf = apply(tmp.bio_nf.array,1,function(x)sum(colMeans(x)))/biomass.units
+						dt.list[[i]] = data.table::data.table(time=as.numeric(names(tmp.bio)),bio=tmp.bio,bio_nf=tmp.bio_nf,dep=tmp.bio/tmp.bio_nf,model=rep(tmp.name,length(tmp.bio)),region=rep("All regions",length(tmp.bio)))
+						rm(list=c("tmp.bio","tmp.bio.array","tmp.bio_nf","tmp.bio_nf.array"))
 					} else {
 						stop("Invalid biomass.type. Please use either 'SSB' or 'Total'")
 					}
 				} else {
-					stop("Disaggregated regions has not been developed as an option yet")
+					if(biomass.type == "SSB")
+					{
+						ylab = "Spawning Potential"
+
+						tmp.bio = data.table::as.data.table(adultBiomass(tmp.rep)) %>% .[,.(bio=mean(value)/biomass.units),by=.(year,area)] %>%
+								  data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
+						tmp.bio_nf = data.table::as.data.table(adultBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)/biomass.units),by=.(year,area)] %>%
+								  data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+
+						rm(list=c("tmp.bio","tmp.bio_nf"))
+					} else if(biomass.type == "Total"){
+						ylab = "Total Biomass"
+						tmp.bio = data.table::as.data.table(totalBiomass(tmp.rep)) %>% .[,.(bio=mean(value)/biomass.units),by=.(year,area)] %>%
+								  data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
+						tmp.bio_nf = data.table::as.data.table(totalBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)/biomass.units),by=.(year,area)] %>%
+								  data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+
+						rm(list=c("tmp.bio","tmp.bio_nf"))
+					} else {
+						stop("Invalid biomass.type. Please use either 'SSB' or 'Total'")
+					}
 				}
 			} else {
-				stop("Disaggregated years has not been developed as an option yet")
+				mlab = "Seasonal"
+				if(agg.regions)
+				{
+					if(biomass.type == "SSB")
+					{
+						ylab = "Spawning Potential"
+
+						tmp.bio = data.table::as.data.table(adultBiomass(tmp.rep)) %>% .[,.(bio=sum(value)/biomass.units),by=.(year,season)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>%
+								  .[,region:="All regions"] %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						tmp.bio_nf = data.table::as.data.table(adultBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=sum(value)/biomass.units),by=.(year,season)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>%
+								  .[,region:="All regions"] %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+
+						rm(list=c("tmp.bio","tmp.bio_nf"))
+					} else if(biomass.type == "Total"){
+						ylab = "Total Biomass"
+
+						tmp.bio = data.table::as.data.table(totalBiomass(tmp.rep)) %>% .[,.(bio=sum(value)/biomass.units),by=.(year,season)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>%
+								  .[,region:="All regions"] %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						tmp.bio_nf = data.table::as.data.table(totalBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=sum(value)/biomass.units),by=.(year,season)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>%
+								  .[,region:="All regions"] %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+
+						rm(list=c("tmp.bio","tmp.bio_nf"))
+					} else {
+						stop("Invalid biomass.type. Please use either 'SSB' or 'Total'")
+					}
+				} else {
+					if(biomass.type == "SSB")
+					{
+						ylab = "Spawning Potential"
+
+						tmp.bio = data.table::as.data.table(adultBiomass(tmp.rep)) %>% .[,.(bio=mean(value)/biomass.units),by=.(year,season,area)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>%
+								  data.table::setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						tmp.bio_nf = data.table::as.data.table(adultBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)/biomass.units),by=.(year,season,area)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>%
+								  data.table::setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+
+						rm(list=c("tmp.bio","tmp.bio_nf"))
+					} else if(biomass.type == "Total"){
+						ylab = "Total Biomass"
+						tmp.bio = data.table::as.data.table(totalBiomass(tmp.rep)) %>% .[,.(bio=mean(value)/biomass.units),by=.(year,season,area)] %>% .[,year:=as.numeric(year)] %>% .[,seasons:=as.numeric(seasons)] %>%
+								  data.table::setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						tmp.bio_nf = data.table::as.data.table(totalBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)/biomass.units),by=.(year,season,area)] %>% .[,year:=as.numeric(year)] %>% .[,seasons:=as.numeric(seasons)] %>%
+								  data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+
+
+						rm(list=c("tmp.bio","tmp.bio_nf"))
+					} else {
+						stop("Invalid biomass.type. Please use either 'SSB' or 'Total'")
+					}
+				}
 			}
 
 			# clean-up
@@ -77,7 +161,7 @@ plot.biomass = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRU
 			g = plot.dt %>% 
 			ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region) +
 			ggplot2::xlab("Year") +
-			ggplot2::ggtitle("Estimated biomass (1000s mt)") +
+			ggplot2::ggtitle(paste0("Estimated biomass (",formatC(biomass.units, format="f", big.mark=",", digits=0),"s mt) - ",mlab)) +
 			ggplot2::scale_y_continuous(name=ylab,breaks = pretty,limits=c(0,max(plot.dt$bio))) +
 			ggplot2::geom_line(ggplot2::aes(x=time,y=bio,color=model),size=1.25) +
 			ggplot2::scale_color_manual("Model",values=colour_values)
