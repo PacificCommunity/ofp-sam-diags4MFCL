@@ -62,7 +62,7 @@ plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,
 		ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_grid(Age~Season,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both)) +
 		ggplot2::ggtitle("Estimated regional movement (Model 1 - Model 2)") +
 		ggplot2::geom_tile(ggplot2::aes(x=To,y=From,fill=diff)) +
-		ggplot2::scale_fill_gradient2("Diffusion difference")
+		ggplot2::scale_fill_gradient2("Diffusion difference",low = "#448aff",high = "#ff5252")
     } else if(length(pars)==1){
     	move.coef = data.table::as.data.table(diff_coffs_age_period(pars[[1]]))
 
