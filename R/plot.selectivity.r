@@ -6,6 +6,7 @@
 #' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
 #' @param sel.basis A character string indicating if selectivity at age ('AGE') or length ('Length') should be plotted
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
+#' @param fisheries A vector giving the number of the fisheries to plot. Default is to plot everything.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
@@ -28,7 +29,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.func=default.model.colours, save.dir,save.name, ...)
+plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.func=default.model.colours,fisheries, save.dir,save.name, ...)
 {
 	  # Check and sanitise input MFCLRep arguments and names
     rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
@@ -66,6 +67,12 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 		
 		# combine into single data.table
 			plot.dt = data.table::rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
+			
+		# only plot fisheries that are in the provided vector (if provided)
+			if(!missing(fisheries))
+			{
+				plot.dt = plot.dt[fishery %in% fisheries]
+			}
 
 		# make plot
 			# Get the colours - if all.model.names passed in using ... then it is passed to palette func
