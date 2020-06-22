@@ -106,27 +106,60 @@ plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, scal
 #' Plot the observed and predicted tag recaptures against time at liberty by tagging program, or all tagging programs combined.
 #' The plot is either a time series of the difference between the observed and predicted, or a time series of the recaptures.
 #' A loess smoother is put through the differences.
-#' @param tagdat Tagging data created by the \code{tag.data.preparation()} function.
+#' @param tagdat.list A list, or an individual data.frame, of tagging data created by the \code{tag.data.preparation()} function.
+#' @param tagdat.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.
 #' @param facet.program Do you want to process and plot by tagging program, or combine the tagging programs. TRUE (default) or FALSE.
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
 #' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
+#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
+#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ... Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale.diff=TRUE, save.dir, save.name){
+plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet.program=TRUE, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, ...){
+  
+  # If not plotting the difference don't scale it
+  if(plot.diff == FALSE){
+    scale.diff <- FALSE
+  }
+  
+  # Sort out the list of inputs
+  tagdat.list <- check.tagdat.args(tagdat.list, tagdat.names) 
+  # If plotting time series of actuals, can only plot one model at a time
+  if(plot.diff == FALSE & length(tagdat.list) != 1){
+    stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagdat list.")
+  }
+  # Collapse into a single data.frame
+  tagdat <- as.data.frame(data.table::rbindlist(tagdat.list, idcol="Model"))
+  #tagdat <- data.table::rbindlist(tagdat.list, idcol="Model")
+  
+  #browser()
   
   # Y lab for the difference plot without scaling - overwritten if scaled
   ylab <- "Observed - predicted recaptures"
   # Sum number of tags by period at liberty
   # Depends if we want to process by tag program
+  
+  
   if (facet.program==FALSE){
+    #grouping_names <- c("Model", "period_at_liberty")
+    
     pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
-                 list(period_at_liberty = tagdat$period_at_liberty),
+                 list(Model= tagdat$Model, period_at_liberty = tagdat$period_at_liberty),
                  sum, na.rm=TRUE)
+    
+    
+    #pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=.(Model, period_at_liberty)]
+    #pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=mget(grouping_names)]
+    
+    
     pdat$diff <- pdat$recap.obs - pdat$recap.pred
     if(scale.diff == TRUE){
+      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(Model=pdat$Model), sum, na.rm=TRUE)
+      pdat <- merge(pdat, total_recaptured)
       pdat$diff <- pdat$diff / sum(pdat$recap.obs, na.rm=TRUE)
       ylab <- "Obs. - pred. recaptures (scaled)"
     }
@@ -139,12 +172,12 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale
   # Same again but keep the program info
   if (facet.program==TRUE){
     pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
-                 list(period_at_liberty = tagdat$period_at_liberty, program=tagdat$program),
+                 list(Model= tagdat$Model, period_at_liberty = tagdat$period_at_liberty, program=tagdat$program),
                  sum, na.rm=TRUE)
     pdat$diff <- pdat$recap.obs - pdat$recap.pred
     # Scale by number of tags in each program if needed
     if(scale.diff == TRUE){
-      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(program=pdat$program), sum, na.rm=TRUE)
+      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(Model=pdat$Model, program=pdat$program), sum, na.rm=TRUE)
       pdat <- merge(pdat, total_recaptured)
       pdat$diff <- pdat$diff / sum(pdat$recap.obs, na.rm=TRUE)
       ylab <- "Obs. - pred. recaptures (scaled)"
@@ -163,9 +196,7 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale
     p <- ggplot2::ggplot(pdat, ggplot2::aes(x=period_at_liberty))
     p <- p + ggplot2::geom_point(ggplot2::aes(y=recap.obs), colour="red")
     p <- p + ggplot2::geom_line(ggplot2::aes(y=recap.pred))
-    if(facet.program == TRUE){
-      p <- p + ggplot2::facet_wrap(~program, scales="free")
-    }
+    p <- p + ggplot2::facet_wrap(~program, scales="free")
     p <- p + ggplot2::xlab("Periods at liberty (quarters)")
     p <- p + ggplot2::ylab("Number of tag returns")
     p <- p + ggplot2::ylim(c(0,NA))
@@ -174,21 +205,27 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale
   
   # Residuals
   if(plot.diff == TRUE){
+    colour_values <- palette.func(selected.model.names = names(tagdat.list), ...)
     # Get dummy data to set nice looking ylims
     no_progs <- length(unique(pdat$program))
     ylims <- tapply(pdat$diff, pdat$program, function(x) c(max(abs(x), na.rm=T), -max(abs(x), na.rm=T)))
     dummydat <- data.frame(y=unlist(ylims), x=rep(c(min(pdat$period_at_liberty), max(pdat$period_at_liberty)), no_progs), program = rep(names(ylims), each=2))
     p <- ggplot2::ggplot(pdat, aes(x=period_at_liberty, y=diff))
-    p <- p + ggplot2::geom_point()
-    p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
-    p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
-    if(facet.program == TRUE){
-      p <- p + ggplot2::facet_wrap(~program, scales="free")
+    # If only 1 model, draw points and turn off legend
+    if (length(tagdat.list)==1){
+      p <- p + ggplot2::geom_point()
     }
+    p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+    p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
+    p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
+    p <- p + ggplot2::facet_wrap(~program, scales="free")
     p <- p + ggplot2::ylab(ylab)
     p <- p + ggplot2::xlab("Periods at liberty (quarters)")
     p <- p + ggthemes::theme_few()
     p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
+    if (show.legend==FALSE){
+      p <- p + theme(legend.position="none") 
+    }
     
   }
   
@@ -205,7 +242,7 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale
 #' 
 #' Plot the difference between the predicted and observed proportions of tag returns by region.
 #' Experimental at the moment.
-#' @param tagdat Tagging data created by the \code{tag.data.preparation()} function.
+#' @param tagdat An data.frame of tagging data created by the \code{tag.data.preparation()} function.
 #' @param plot.type What type of plot: 'point' (default) or 'bar'. 
 #' @param save.dir Path to the directory where the outputs will be saved.
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory.
@@ -213,6 +250,8 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale
 #' @import FLR4MFCL
 #' @import magrittr
 plot.tag.return.proportion <- function(tagdat, plot.type="point", save.dir, save.name){
+  
+  # Could use data.table here
   # Get sum of recaptures by release and recapture region and by recapture quarter (month)
   recap_reg <- aggregate(list(recap.pred=tagdat$recap.pred, recap.obs=tagdat$recap.obs),
     list(rel.region = tagdat$rel.region, recap.region=tagdat$recap.region, recap.month=tagdat$recap.month),

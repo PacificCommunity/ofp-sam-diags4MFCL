@@ -5,16 +5,22 @@
 \title{Plot the observed and predicted tag attrition.}
 \usage{
 plot.tag.attrition(
-  tagdat,
+  tagdat.list,
+  tagdat.names = NULL,
   facet.program = TRUE,
   plot.diff = TRUE,
   scale.diff = TRUE,
+  show.legend = TRUE,
+  palette.func = default.model.colours,
   save.dir,
-  save.name
+  save.name,
+  ...
 )
 }
 \arguments{
-\item{tagdat}{Tagging data created by the \code{tag.data.preparation()} function.}
+\item{tagdat.list}{A list, or an individual data.frame, of tagging data created by the \code{tag.data.preparation()} function.}
+
+\item{tagdat.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.}
 
 \item{facet.program}{Do you want to process and plot by tagging program, or combine the tagging programs. TRUE (default) or FALSE.}
 
@@ -22,9 +28,15 @@ plot.tag.attrition(
 
 \item{scale.diff}{If TRUE, the difference between observed and predicted is scaled by the number of observed returns.}
 
+\item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
+
+\item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
+
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
+
+\item{...}{Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.}
 }
 \description{
 Plot the observed and predicted tag recaptures against time at liberty by tagging program, or all tagging programs combined.
