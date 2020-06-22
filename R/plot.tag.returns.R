@@ -9,6 +9,7 @@
 #' @param tagdat Tagging data created by the \code{tag.data.preparation()} function.
 #' @param recapture.groups A vector of the reference numbers of the tag recapture groups you want to plot.
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
+#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
@@ -18,7 +19,7 @@
 #' @importFrom data.table rbindlist
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 geom_blank
-plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, save.dir, save.name){
+plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, save.dir, save.name){
   
   # ID observations that are within the mixing period  
   mixing_rows <- tagdat$recap.ts < (tagdat$rel.ts + tagdat$mixing_period_quarters) 
@@ -66,21 +67,30 @@ plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, save
   
   if(plot.diff == TRUE){
     # Or plot the difference - need to scale by number of recaptures?
-    pdat$diff <- pdat$recap.pred - pdat$recap.obs
+    pdat$diff <- pdat$recap.obs - pdat$recap.pred
     # Alt. - problem with obs = 0, leads to infinite difference
     # pdat$diff <- log(pdat$recap.pred / pdat$recap.obs)
+    # Normalise so maximum diff = 1
+    # Get total recaptured observed
+    ylab <- "Observed - predicted recaptures"
+    # Normalise
+    if(scale.diff == TRUE){
+      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(tag_recapture_group = pdat$tag_recapture_group), sum, na.rm=TRUE)
+      pdat <- merge(pdat, total_recaptured)
+      pdat$diff <- pdat$diff / pdat$total_obs_recap
+      ylab <- "Obs. - pred. recaptures (scaled)"
+    }
     # Spoof up approriate y ranges for each facet using geom_blank()
     no_grps <- length(unique(pdat$tag_recapture_name))
     ylims <- tapply(pdat$diff, pdat$tag_recapture_name, function(x) c(max(abs(x), na.rm=T), -max(abs(x), na.rm=T)))
     dummydat <- data.frame(y=unlist(ylims), x=rep(c(min(pdat$recap.ts), max(pdat$recap.ts)), no_grps), tag_recapture_name = rep(names(ylims), each=2))
     p <- ggplot2::ggplot(pdat, ggplot2::aes(x=recap.ts, y=diff))
     p <- p + ggplot2::geom_point(na.rm=TRUE)
-    p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE)
+    p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
     p <- p + ggplot2::facet_wrap(~tag_recapture_name, scales="free")
     p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
     p <- p + ggthemes::theme_few()
-    p <- p + ggplot2::xlab("Time") + ggplot2::ylab("Predicted - observed recaptures")
-    #p <- p + ggplot2::xlab("Time") + ggplot2::ylab("log(Predicted / observed) recaptures")
+    p <- p + ggplot2::xlab("Time") + ggplot2::ylab(ylab)
     p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
   }
   
@@ -99,33 +109,49 @@ plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, save
 #' @param tagdat Tagging data created by the \code{tag.data.preparation()} function.
 #' @param facet.program Do you want to process and plot by tagging program, or combine the tagging programs. TRUE (default) or FALSE.
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
+#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, save.dir, save.name){
+plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, scale.diff=TRUE, save.dir, save.name){
   
+  # Y lab for the difference plot without scaling - overwritten if scaled
+  ylab <- "Observed - predicted recaptures"
   # Sum number of tags by period at liberty
   # Depends if we want to process by tag program
   if (facet.program==FALSE){
-  pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
+    pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
                  list(period_at_liberty = tagdat$period_at_liberty),
                  sum, na.rm=TRUE)
-  pdat$diff <- pdat$recap.pred - pdat$recap.obs
+    pdat$diff <- pdat$recap.obs - pdat$recap.pred
+    if(scale.diff == TRUE){
+      pdat$diff <- pdat$diff / sum(pdat$recap.obs, na.rm=TRUE)
+      ylab <- "Obs. - pred. recaptures (scaled)"
+    }
   # Need to pad out time series
-  padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1))
-  pdat <- merge(pdat, padts, all=TRUE)
+    padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1))
+    pdat <- merge(pdat, padts, all=TRUE)
+    pdat$program <- "All programs" # Dropped later, but needed for convenience
   }
+  
   # Same again but keep the program info
   if (facet.program==TRUE){
-  pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
+    pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
                  list(period_at_liberty = tagdat$period_at_liberty, program=tagdat$program),
                  sum, na.rm=TRUE)
-  pdat$diff <- pdat$recap.pred - pdat$recap.obs
-  # Need to pad out time series
-  padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)))
-  pdat <- merge(pdat, padts, all=TRUE)
+    pdat$diff <- pdat$recap.obs - pdat$recap.pred
+    # Scale by number of tags in each program if needed
+    if(scale.diff == TRUE){
+      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(program=pdat$program), sum, na.rm=TRUE)
+      pdat <- merge(pdat, total_recaptured)
+      pdat$diff <- pdat$diff / sum(pdat$recap.obs, na.rm=TRUE)
+      ylab <- "Obs. - pred. recaptures (scaled)"
+    }
+    # Need to pad out time series
+    padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)))
+    pdat <- merge(pdat, padts, all=TRUE)
   }
   
   # Time series
@@ -159,7 +185,7 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, save.
     if(facet.program == TRUE){
       p <- p + ggplot2::facet_wrap(~program, scales="free")
     }
-    p <- p + ggplot2::ylab("Predicted - observed recaptures")
+    p <- p + ggplot2::ylab(ylab)
     p <- p + ggplot2::xlab("Periods at liberty (quarters)")
     p <- p + ggthemes::theme_few()
     p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
@@ -187,7 +213,6 @@ plot.tag.attrition <- function(tagdat, facet.program=TRUE, plot.diff=TRUE, save.
 #' @import FLR4MFCL
 #' @import magrittr
 plot.tag.return.proportion <- function(tagdat, plot.type="point", save.dir, save.name){
-  
   # Get sum of recaptures by release and recapture region and by recapture quarter (month)
   recap_reg <- aggregate(list(recap.pred=tagdat$recap.pred, recap.obs=tagdat$recap.obs),
     list(rel.region = tagdat$rel.region, recap.region=tagdat$recap.region, recap.month=tagdat$recap.month),
@@ -217,8 +242,8 @@ plot.tag.return.proportion <- function(tagdat, plot.type="point", save.dir, save
   #p
 
   # Plot of the difference between predicted and observed proportion of tags returned by region of release
-  recap_reg$diff.prop <- recap_reg$pred.prop - recap_reg$obs.prop
-  recap_reg$diff.prop2 <- log(recap_reg$pred.prop / recap_reg$obs.prop)
+  recap_reg$diff.prop <- recap_reg$obs.prop - recap_reg$pred.prop
+  #recap_reg$diff.prop2 <- log(recap_reg$pred.prop / recap_reg$obs.prop)
   recap_reg$rel.region.name <- paste("Release region ", recap_reg$rel.region, sep="")
   recap_reg$Quarter <- as.factor((recap_reg$recap.month+1) / 3)
 
@@ -239,7 +264,7 @@ plot.tag.return.proportion <- function(tagdat, plot.type="point", save.dir, save
     p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
     p <- p + ggthemes::theme_few()
     p <- p + ggplot2::xlab("Recapture region")
-    p <- p + ggplot2::ylab("Predicted proportion - observed proportion")
+    p <- p + ggplot2::ylab("Observed proportion - predicted proportion")
     p <- p + ggplot2::geom_blank(data=dummydat, ggplot2::aes(x=x, y=y))
   }
 
@@ -250,7 +275,7 @@ plot.tag.return.proportion <- function(tagdat, plot.type="point", save.dir, save
     p <- p + ggplot2::facet_wrap(~rel.region.name, ncol=2, scales="free")
     p <- p + ggplot2::xlab("Recapture region")
     p <- p + ggplot2::geom_hline(aes(yintercept=0.0))
-    p <- p + ggplot2::ylab("Predicted proportion - observed proportion")
+    p <- p + ggplot2::ylab("Observed proportion - predicted proportion")
     p <- p + ggthemes::theme_few()
     p <- p + ggplot2::geom_blank(data=dummydat, ggplot2::aes(x=x, y=y))
   }

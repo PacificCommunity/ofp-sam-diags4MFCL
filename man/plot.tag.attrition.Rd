@@ -8,6 +8,7 @@ plot.tag.attrition(
   tagdat,
   facet.program = TRUE,
   plot.diff = TRUE,
+  scale.diff = TRUE,
   save.dir,
   save.name
 )
@@ -18,6 +19,8 @@ plot.tag.attrition(
 \item{facet.program}{Do you want to process and plot by tagging program, or combine the tagging programs. TRUE (default) or FALSE.}
 
 \item{plot.diff}{Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.}
+
+\item{scale.diff}{If TRUE, the difference between observed and predicted is scaled by the number of observed returns.}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
