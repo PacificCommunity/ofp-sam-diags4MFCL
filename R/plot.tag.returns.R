@@ -132,60 +132,37 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet.program=TRU
   if(plot.diff == FALSE & length(tagdat.list) != 1){
     stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagdat list.")
   }
-  # Collapse into a single data.frame
-  tagdat <- as.data.frame(data.table::rbindlist(tagdat.list, idcol="Model"))
-  #tagdat <- data.table::rbindlist(tagdat.list, idcol="Model")
-  
-  #browser()
+  # Collapse into a single data.table
+  tagdat <- data.table::rbindlist(tagdat.list, idcol="Model")
   
   # Y lab for the difference plot without scaling - overwritten if scaled
   ylab <- "Observed - predicted recaptures"
+  
   # Sum number of tags by period at liberty
   # Depends if we want to process by tag program
-  
-  
   if (facet.program==FALSE){
-    #grouping_names <- c("Model", "period_at_liberty")
-    
-    pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
-                 list(Model= tagdat$Model, period_at_liberty = tagdat$period_at_liberty),
-                 sum, na.rm=TRUE)
-    
-    
-    #pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=.(Model, period_at_liberty)]
-    #pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=mget(grouping_names)]
-    
-    
-    pdat$diff <- pdat$recap.obs - pdat$recap.pred
-    if(scale.diff == TRUE){
-      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(Model=pdat$Model), sum, na.rm=TRUE)
-      pdat <- merge(pdat, total_recaptured)
-      pdat$diff <- pdat$diff / sum(pdat$recap.obs, na.rm=TRUE)
-      ylab <- "Obs. - pred. recaptures (scaled)"
-    }
-  # Need to pad out time series
-    padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1))
-    pdat <- merge(pdat, padts, all=TRUE)
-    pdat$program <- "All programs" # Dropped later, but needed for convenience
+    grouping_names <- c("Model", "period_at_liberty")
+  }
+  if (facet.program==TRUE){
+    grouping_names <- c("Model", "period_at_liberty", "program")
   }
   
-  # Same again but keep the program info
-  if (facet.program==TRUE){
-    pdat <- aggregate(list(recap.obs = tagdat$recap.obs, recap.pred = tagdat$recap.pred),
-                 list(Model= tagdat$Model, period_at_liberty = tagdat$period_at_liberty, program=tagdat$program),
-                 sum, na.rm=TRUE)
-    pdat$diff <- pdat$recap.obs - pdat$recap.pred
-    # Scale by number of tags in each program if needed
-    if(scale.diff == TRUE){
-      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(Model=pdat$Model, program=pdat$program), sum, na.rm=TRUE)
-      pdat <- merge(pdat, total_recaptured)
-      pdat$diff <- pdat$diff / sum(pdat$recap.obs, na.rm=TRUE)
-      ylab <- "Obs. - pred. recaptures (scaled)"
+  pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=mget(grouping_names)]
+  pdat$diff <- pdat$recap.obs - pdat$recap.pred
+  if(scale.diff == TRUE){
+    # Don't group by period at liberty
+    grouping_names <- grouping_names[grouping_names!="period_at_liberty"] 
+    total_recaptured <- pdat[,.(total_obs_recap=sum(recap.obs, na.rm=TRUE)), by=mget(grouping_names)]
+    pdat <- merge(pdat, total_recaptured)
+    pdat$diff <- pdat$diff / pdat$total_obs_recap
+    ylab <- "Obs. - pred. recaptures (scaled)"
     }
-    # Need to pad out time series
-    padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)))
-    pdat <- merge(pdat, padts, all=TRUE)
+  if (facet.program==FALSE){
+    pdat$program <- "All programs"
   }
+  # Need to pad out time series - merge has stopped working with data.table
+  padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)))
+  pdat <- merge(padts, pdat, all=TRUE)
   
   # Time series
   if(plot.diff == FALSE){
