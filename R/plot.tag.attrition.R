@@ -109,8 +109,11 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
     # Start...
     p <- ggplot2::ggplot(pdat, aes(x=period_at_liberty, y=diff))
     # If only 1 model, draw points and turn off legend
+    # Ensure symetrical y-axes only works when not showing points
+    # https://stackoverflow.com/questions/9789871/method-to-extract-stat-smooth-line-fit 
     if (show.points==TRUE){
       p <- p + ggplot2::geom_point(aes(colour=Model))
+      p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
     }
     p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
     p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
@@ -124,8 +127,6 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
     p <- p + ggplot2::ylab(ylab)
     p <- p + ggplot2::xlab("Periods at liberty (quarters)")
     p <- p + ggthemes::theme_few()
-    # Ensure symetrical y-axes
-    p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
     if (show.legend==FALSE){
       p <- p + theme(legend.position="none") 
     }
