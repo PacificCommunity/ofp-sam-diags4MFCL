@@ -119,7 +119,7 @@ plot.tag.returns.time <- function(tagdat.list, tagdat.names=NULL, recapture.grou
 #' 
 #' Plot the difference between the predicted and observed proportions of tag returns by region.
 #' Experimental at the moment.
-#' @param tagdat An data.frame of tagging data created by the \code{tag.data.preparation()} function.
+#' @param tagdat A data.frame of tagging data created by the \code{tag.data.preparation()} function.
 #' @param plot.type What type of plot: 'point' (default) or 'bar'. 
 #' @param save.dir Path to the directory where the outputs will be saved.
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory.
