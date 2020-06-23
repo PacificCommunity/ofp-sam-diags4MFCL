@@ -5,16 +5,23 @@
 \title{Plot the observed and predicted tag recaptures.}
 \usage{
 plot.tag.returns.time(
-  tagdat,
+  tagdat.list,
+  tagdat.names = NULL,
   recapture.groups,
   plot.diff = TRUE,
   scale.diff = TRUE,
+  show.legend = TRUE,
+  show.points = FALSE,
+  palette.func = default.model.colours,
   save.dir,
-  save.name
+  save.name,
+  ...
 )
 }
 \arguments{
-\item{tagdat}{Tagging data created by the \code{tag.data.preparation()} function.}
+\item{tagdat.list}{A list, or an individual data.frame, of tagging data created by the \code{tag.data.preparation()} function.}
+
+\item{tagdat.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.}
 
 \item{recapture.groups}{A vector of the reference numbers of the tag recapture groups you want to plot.}
 
@@ -22,9 +29,17 @@ plot.tag.returns.time(
 
 \item{scale.diff}{If TRUE, the difference between observed and predicted is scaled by the number of observed returns.}
 
+\item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
+
+\item{show.points}{Do you want to show points as well as the smoother for the difference plots? Default is FALSE.}
+
+\item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
+
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
+
+\item{...}{Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.}
 }
 \description{
 Plot the observed and predicted tag recaptures by tag recapture group.

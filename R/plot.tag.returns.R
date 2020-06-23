@@ -6,12 +6,17 @@
 #' Tags caught during the mixing period are not counted.
 #' The plot is either a time series of the difference between the observed and predicted, or a time series of the recaptures.
 #' A loess smoother is put through the differences.
-#' @param tagdat Tagging data created by the \code{tag.data.preparation()} function.
+#' @param tagdat.list A list, or an individual data.frame, of tagging data created by the \code{tag.data.preparation()} function.
+#' @param tagdat.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.
 #' @param recapture.groups A vector of the reference numbers of the tag recapture groups you want to plot.
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
 #' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
+#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
+#' @param show.points Do you want to show points as well as the smoother for the difference plots? Default is FALSE.
+#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ... Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
@@ -19,37 +24,38 @@
 #' @importFrom data.table rbindlist
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 geom_blank
-plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, save.dir, save.name){
+plot.tag.returns.time <- function(tagdat.list, tagdat.names=NULL, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   
-  # ID observations that are within the mixing period  
-  mixing_rows <- tagdat$recap.ts < (tagdat$rel.ts + tagdat$mixing_period_quarters) 
-  # And drop them
-  tagdat <- tagdat[!mixing_rows,]
+  # If not plotting the difference don't scale it
+  if(plot.diff == FALSE){
+    scale.diff <- FALSE
+  }
   
-  # Try to subset the recapture groups beforehand but we ended making a mess
-  # when trying to pad timeseries
+  # Sort out the list of inputs
+  tagdat.list <- check.tagdat.args(tagdat.list, tagdat.names) 
+  # If plotting time series of actuals, can only plot one model at a time
+  if(plot.diff == FALSE & length(tagdat.list) != 1){
+    stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagdat list.")
+  }
   
-  # Prepare data for plotting
-  # Sum predicted and observed recaptures in each timestep for each tag recapture group
-  pdat <- aggregate(list(recap.pred = tagdat$recap.pred, recap.obs=tagdat$recap.obs),
-                    list(tag_recapture_group = tagdat$tag_recapture_group,
-                         tag_recapture_name = tagdat$tag_recapture_name,
-                         recap.ts = tagdat$recap.ts), sum, na.rm=TRUE)
-  # Reorder so it's helpful for debugging
-  #pdat <- pdat[order(pdat$tag_recapture_group, pdat$recap.ts),]
-  
-  # Subset the recapture groups - do earlier to save time?
-  pdat <- subset(pdat, tag_recapture_group %in% recapture.groups)
+  # Collapse into a single data.table
+  tagdat <- data.table::rbindlist(tagdat.list, idcol="Model")
+  # Drop recapture groups we don't want
+  tagdat <- tagdat[tag_recapture_group %in% recapture.groups,]
+  # Drop observations that are within the mixing period  
+  tagdat <- tagdat[!(recap.ts < (rel.ts + mixing_period_quarters)),]
+  # Summarise returns by recapture group
+  pdat <- tagdat[,.(recap.pred = sum(recap.pred, na.rm=TRUE), recap.obs = sum(recap.obs, na.rm=TRUE)), by=.(tag_recapture_group, tag_recapture_name, recap.ts, Model)]  
   
   # To ensure plotting is OK we need each fishery to have a full complement of time series
   # observations, even if NA.
   # This is a right pain in the bum - must be an easier way
   # Need to pad out time series
-  no_seasons <- length(unique(tagdat$recap.month)) # this is unsafe, how best to get no seasons?
-  padts <- expand.grid(recap.ts = seq(from=min(pdat$recap.ts), to=max(pdat$recap.ts), by= 1 / no_seasons), tag_recapture_group = sort(unique(pdat$tag_recapture_group)))
-  # Bring in the recapture group name
-  padts <- merge(padts, unique(pdat[,c("tag_recapture_group","tag_recapture_name")]))
-  pdat <- merge(pdat, padts, all=TRUE)
+  no_seasons <- length(unique(tagdat.list[[1]]$recap.month)) # this is unsafe, how best to get no seasons?
+  padts <- expand.grid(recap.ts = seq(from=min(pdat$recap.ts), to=max(pdat$recap.ts), by= 1 / no_seasons), tag_recapture_name = sort(unique(pdat$tag_recapture_name)), Model=sort(unique(pdat$Model)))
+  # Bring in the recapture name
+  # Careful here as recapture_group gets filled with NAs
+  pdat <- merge(pdat, padts, all=TRUE, by=colnames(padts))
   
   # Mathew's plot. Time series of predicted and observed
   if(plot.diff == FALSE){
@@ -65,145 +71,39 @@ plot.tag.returns.time <- function(tagdat, recapture.groups, plot.diff=TRUE, scal
     p <- p + ggthemes::theme_few()
   }
   
+  
   if(plot.diff == TRUE){
+    colour_values <- palette.func(selected.model.names = names(tagdat.list), ...)
     # Or plot the difference - need to scale by number of recaptures?
     pdat$diff <- pdat$recap.obs - pdat$recap.pred
-    # Alt. - problem with obs = 0, leads to infinite difference
-    # pdat$diff <- log(pdat$recap.pred / pdat$recap.obs)
-    # Normalise so maximum diff = 1
-    # Get total recaptured observed
     ylab <- "Observed - predicted recaptures"
     # Normalise
     if(scale.diff == TRUE){
-      total_recaptured <- aggregate(list(total_obs_recap=pdat$recap.obs), list(tag_recapture_group = pdat$tag_recapture_group), sum, na.rm=TRUE)
-      pdat <- merge(pdat, total_recaptured)
-      pdat$diff <- pdat$diff / pdat$total_obs_recap
+      # Rescale the diffs by the total recaptures in that group
+      pdat <- pdat[,.(Model=Model, recap.ts=recap.ts, diff = diff / sum(recap.obs, na.rm=TRUE)), by=.(tag_recapture_name)]
       ylab <- "Obs. - pred. recaptures (scaled)"
     }
     # Spoof up approriate y ranges for each facet using geom_blank()
-    no_grps <- length(unique(pdat$tag_recapture_name))
-    ylims <- tapply(pdat$diff, pdat$tag_recapture_name, function(x) c(max(abs(x), na.rm=T), -max(abs(x), na.rm=T)))
-    dummydat <- data.frame(y=unlist(ylims), x=rep(c(min(pdat$recap.ts), max(pdat$recap.ts)), no_grps), tag_recapture_name = rep(names(ylims), each=2))
+    dummydat <- pdat[,.(y = c(max(abs(diff), na.rm=T), -max(abs(diff), na.rm=T))), by=.(tag_recapture_name)]
+    dummydat$x <- rep(c(min(pdat$recap.ts), max(pdat$recap.ts)), nrow(dummydat)/2)
+    
     p <- ggplot2::ggplot(pdat, ggplot2::aes(x=recap.ts, y=diff))
-    p <- p + ggplot2::geom_point(na.rm=TRUE)
-    p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+    # If showing points, also make y axes symmetrical
+    # If you want symetrical points with just the smoother look at
+    # https://stackoverflow.com/questions/9789871/method-to-extract-stat-smooth-line-fit 
+    if(show.points==TRUE){
+      p <- p + ggplot2::geom_point(aes(colour=Model), na.rm=TRUE)
+      p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
+    }
+    p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+    p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
     p <- p + ggplot2::facet_wrap(~tag_recapture_name, scales="free")
     p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
     p <- p + ggthemes::theme_few()
     p <- p + ggplot2::xlab("Time") + ggplot2::ylab(ylab)
-    p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
-  }
-  
-  save_plot(save.dir, save.name, plot=p)
-  
-  return(p)
-}
-
-## Similar to Figs 28 and 29 in SKJ
-## Attrition rate by tagging program
-#' Plot the observed and predicted tag attrition.
-#' 
-#' Plot the observed and predicted tag recaptures against time at liberty by tagging program, or all tagging programs combined.
-#' The plot is either a time series of the difference between the observed and predicted, or a time series of the recaptures.
-#' A loess smoother is put through the differences.
-#' @param tagdat.list A list, or an individual data.frame, of tagging data created by the \code{tag.data.preparation()} function.
-#' @param tagdat.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.
-#' @param facet.program Do you want to process and plot by tagging program, or combine the tagging programs. TRUE (default) or FALSE.
-#' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
-#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
-#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
-#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
-#' @param save.dir Path to the directory where the outputs will be saved
-#' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
-#' @param ... Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.
-#' @export
-#' @import FLR4MFCL
-#' @import magrittr
-plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet.program=TRUE, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, ...){
-  
-  # If not plotting the difference don't scale it
-  if(plot.diff == FALSE){
-    scale.diff <- FALSE
-  }
-  
-  # Sort out the list of inputs
-  tagdat.list <- check.tagdat.args(tagdat.list, tagdat.names) 
-  # If plotting time series of actuals, can only plot one model at a time
-  if(plot.diff == FALSE & length(tagdat.list) != 1){
-    stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagdat list.")
-  }
-  # Collapse into a single data.table
-  tagdat <- data.table::rbindlist(tagdat.list, idcol="Model")
-  
-  # Y lab for the difference plot without scaling - overwritten if scaled
-  ylab <- "Observed - predicted recaptures"
-  
-  # Sum number of tags by period at liberty
-  # Depends if we want to process by tag program
-  if (facet.program==FALSE){
-    grouping_names <- c("Model", "period_at_liberty")
-  }
-  if (facet.program==TRUE){
-    grouping_names <- c("Model", "period_at_liberty", "program")
-  }
-  
-  pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=mget(grouping_names)]
-  pdat$diff <- pdat$recap.obs - pdat$recap.pred
-  if(scale.diff == TRUE){
-    # Don't group by period at liberty
-    grouping_names <- grouping_names[grouping_names!="period_at_liberty"] 
-    total_recaptured <- pdat[,.(total_obs_recap=sum(recap.obs, na.rm=TRUE)), by=mget(grouping_names)]
-    pdat <- merge(pdat, total_recaptured)
-    pdat$diff <- pdat$diff / pdat$total_obs_recap
-    ylab <- "Obs. - pred. recaptures (scaled)"
-    }
-  if (facet.program==FALSE){
-    pdat$program <- "All programs"
-  }
-  # Need to pad out time series - merge has stopped working with data.table
-  padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)))
-  pdat <- merge(padts, pdat, all=TRUE)
-  
-  # Time series
-  if(plot.diff == FALSE){
-    # For the observed and predicted recaptures, NA is essentially 0,
-    # i.e. there were no recaptures, so set to 0
-    pdat[is.na(pdat$recap.pred), "recap.pred"] <- 0
-    pdat[is.na(pdat$recap.obs), "recap.obs"] <- 0
-    p <- ggplot2::ggplot(pdat, ggplot2::aes(x=period_at_liberty))
-    p <- p + ggplot2::geom_point(ggplot2::aes(y=recap.obs), colour="red")
-    p <- p + ggplot2::geom_line(ggplot2::aes(y=recap.pred))
-    p <- p + ggplot2::facet_wrap(~program, scales="free")
-    p <- p + ggplot2::xlab("Periods at liberty (quarters)")
-    p <- p + ggplot2::ylab("Number of tag returns")
-    p <- p + ggplot2::ylim(c(0,NA))
-    p <- p + ggthemes::theme_few()
-  }
-  
-  # Residuals
-  if(plot.diff == TRUE){
-    colour_values <- palette.func(selected.model.names = names(tagdat.list), ...)
-    # Get dummy data to set nice looking ylims
-    no_progs <- length(unique(pdat$program))
-    ylims <- tapply(pdat$diff, pdat$program, function(x) c(max(abs(x), na.rm=T), -max(abs(x), na.rm=T)))
-    dummydat <- data.frame(y=unlist(ylims), x=rep(c(min(pdat$period_at_liberty), max(pdat$period_at_liberty)), no_progs), program = rep(names(ylims), each=2))
-    p <- ggplot2::ggplot(pdat, aes(x=period_at_liberty, y=diff))
-    # If only 1 model, draw points and turn off legend
-    if (length(tagdat.list)==1){
-      p <- p + ggplot2::geom_point()
-    }
-    p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
-    p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
-    p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
-    p <- p + ggplot2::facet_wrap(~program, scales="free")
-    p <- p + ggplot2::ylab(ylab)
-    p <- p + ggplot2::xlab("Periods at liberty (quarters)")
-    p <- p + ggthemes::theme_few()
-    p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
     if (show.legend==FALSE){
       p <- p + theme(legend.position="none") 
     }
-    
   }
   
   save_plot(save.dir, save.name, plot=p)
