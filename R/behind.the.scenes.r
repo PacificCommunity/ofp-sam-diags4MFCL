@@ -20,6 +20,41 @@ save_plot <- function(save.dir, save.name, plot, width = 9, height = 9){
 }
 		
 
+# Internal function for checking the tagdat arguments
+# Substitute for doing S4 methods
+check.tagdat.args <- function(tagdat, tagdat.names=NULL){
+  bad_argument_types_message <- "The function is expecting a tagdat data.frame, or a list of tagdat data.frames objects."
+  # If just a single data.frame coerce to an unamed list
+  if (class(tagdat) == "data.frame"){
+    tagdat <- list(tagdat)
+  }
+  # If it is a list, check that all elements are data.frames, otherwise fail
+  if (class(tagdat) == "list"){
+    if(!all(lapply(tagdat, class)=="data.frame")){
+      stop(bad_argument_types_message)
+    }
+  }
+  # If it's not a list of data.frames, fail
+  else {
+      stop(bad_argument_types_message)
+  }
+  
+  # At this point rep is a list of data.frame objects
+  # If tagdat.names is supplied, then name the list - overwriting any existing names
+  if (!is.null(tagdat.names)){
+    # Check length of rep.names matches length of list
+    if(length(tagdat.names)!=length(tagdat)){
+      stop("Length of tagdat.names must match the number of data.frames in list.")
+    }
+    names(tagdat) <- tagdat.names
+  }
+  # If there are still no names, make some up
+  if(is.null(names(tagdat))){
+     fake_names <- paste("Model", seq(from=1, to=length(tagdat)), sep="") 
+     names(tagdat) <- fake_names
+  }
+  return(tagdat)
+}
 
 # Internal function for checking the MFCLRep arguments
 # Substitute for doing S4 methods
