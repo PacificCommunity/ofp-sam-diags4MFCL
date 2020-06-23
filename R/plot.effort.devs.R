@@ -10,8 +10,12 @@
 #' @param par An object of MFCLPar that contains the effort deviations.
 #' @param fisheries The numbers of the fisheries to plot.
 #' @param fishery_names The names of the fisheries to plot.
+#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
+#' @param show.points Do you want to show points as well as the smoother for the difference plots? Default is FALSE.
+#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ... Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
@@ -32,37 +36,73 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.effort.devs <- function(frq, par, fisheries, fishery_names, save.dir, save.name){
-  # Check input types - or write as a method - so could just pass in edevs instead of whole par object
-  if (class(par) != "MFCLPar"){
-    stop("par argument must of type of type 'MFCLPar'.")
+plot.effort.devs <- function(frq.list, par.list, fisheries, fishery.names, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  # Check input types - add more checks - farm out to external function
+  if(class(frq.list) != "list"){
+    frq.list <- list(frq.list)
+    names(frq.list)[1] <- "Model 1"
   }
-  if (class(frq) != "MFCLFrq"){
-    stop("frq argument must of type of type 'MFCLFrq'.")
+  if(!all(unlist(lapply(frq.list, function(x) class(x)=="MFCLFrq")))){
+    stop("frq.list must be a named list of MFCLFreq objects")
   }
+  
+  if(class(par.list) != "list"){
+    par.list <- list(par.list)
+    names(par.list)[1] <- "Model 1"
+  }
+  if(!all(unlist(lapply(par.list, function(x) class(x)=="MFCLPar")))){
+    stop("par.list must be a named list of MFCLPar objects")
+  }
+  if(length(par.list) != length(frq.list)){
+    stop("frq.list must be the same length as par.list")
+  }
+  
   # Each fishery has different number edevs - based on realisations
   # Time steps given by frq file
   # This is repeated from the plot.pred.obs.cpue() plot - could farm out to function?
   # Extract the fishing realisations with observed catch, effort and penalty data
-  frqreal <- realisations(frq)
+  real_list <- lapply(frq.list, realisations) 
+  frqreal <- data.table::rbindlist(real_list, idcol="Model")
   # Add timestep column for plotting - ignoring week
   frqreal$ts <- frqreal$year + (frqreal$month-1)/12 + 1/24  # month is mid-month
   # Tidy up missing values
   frqreal$effort[frqreal$effort < 0] <- NA
   frqreal$catch[frqreal$catch< 0] <- NA
+  
   # Get the devs. A list, each element are edevs though time
-  edevs <- effort_dev_coffs(par)
+  # Pull out the effort coffs from each par in the list
+  edevs_list_all <- lapply(par.list, function(x) (effort_dev_coffs(x)))
+  # We now have a list, where each element is a list of coffs
+  # Turn each list element into a vector of coffs
+  edevs_list <- lapply(edevs_list_all, unlist)
+  # Sanity check that the position is OK
+  #lapply(effort_dev_coffs(par.list[[10]]),length)
+  #effort_dev_coffs(par.list[[10]])[[4]][1:10]
+  #edevs[[10]][565:574]
+  # We now have a list of vectors. Collapse into a single vector
+  edevs <- unlist(edevs_list)
+  # Sanity check that the order is right
+  #edevs_list[[2]][[1]][1:10]
+  #test1[5449:5455] 
+  
   # Check that we have all the obs
   if (length(unlist(edevs)) != dim(frqreal)[1]){
     stop("Length of effort devs does not match nrows of fishing realisations.")
   }
   # Force the order to be same as the effort devs so we can just unlist edevs in
-  frqreal <- frqreal[order(frqreal$fishery, frqreal$ts), ]
+  data.table::setorder(frqreal, Model, fishery, ts)
+  # Unlist and hope the order is right!
   frqreal$edev <- unlist(edevs)
+  # Sanity check
+  #subset(frqreal, Model=="A2B0C1D0E0" & fishery==12)
+  #edevs_list_all[["A2B0C1D0E0"]][[12]][1:5]
+  
   # Subset the chosen fisheries
   # Only include edevs where you have a corresponding effort
-  frqreal[is.na(frqreal$effort),"edev"] <- NA
-  pdat <- subset(frqreal, fishery %in% fisheries)
+  #frqreal[is.na(frqreal$effort),"edev"] <- NA
+  #frqreal[is.na(frqreal$effort),.(edev, effort)]
+  frqreal[is.na(frqreal$effort),edev:=NA]
+  pdat <- frqreal[fishery %in% fisheries]
   # Add in fishery names
   fishery_names_df <- data.frame(fishery = fisheries, fishery_names = fishery_names)
   pdat <- merge(pdat, fishery_names_df)
@@ -72,14 +112,28 @@ plot.effort.devs <- function(frq, par, fisheries, fishery_names, save.dir, save.
   # Round it up to nearest 0.5
   ymax <- ceiling(ymax*2)/2
   
+  colour_values <- palette.func(selected.model.names = names(frq.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=edev))
-  p <- p + ggplot2::geom_point(na.rm=TRUE)
-  p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+  if(show.points==TRUE){
+    p <- p + ggplot2::geom_point(aes(colour=Model), na.rm=TRUE, alpha=0.6)
+    p <- p + ggplot2::ylim(c(-ymax,ymax))
+  }
+  # If just one model - colour the smoother red
+  if(length(frq.list)==1){
+    p <- p + ggplot2::geom_smooth(colour="red", method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+  }
+  # Otherwise colour the smoother by model
+  if(length(frq.list)>1){
+    p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+  }
+  p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
   p <- p + ggplot2::facet_wrap(~fishery_names)
   p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
-  p <- p + ggplot2::ylim(c(-ymax,ymax))
   p <- p + ggthemes::theme_few()
   p <- p + ggplot2::xlab("Time") + ggplot2::ylab("Effort deviation")
+  if (show.legend==FALSE){
+    p <- p + theme(legend.position="none") 
+  }
   
   save_plot(save.dir, save.name, plot=p)
   
