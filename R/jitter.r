@@ -130,17 +130,19 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
                 fish_params(par)[1:2,i]=fish_params(par)[1:2,i]*rnorm(2,1,sd)
               }
 
-              ## 4 variance for tag negative binomial
-              if (any(flagval(par,-1:-nFish,43)$value==1)){
+            }
+
+            ## 4 variance for tag negative binomial
+            if (any(flagval(par,-1:-nFish,43)$value==1)){
                 nVars=max(flagval(par,-1:-nFish,44)$value)
 
                 for (i in 1:nVars){
-                  matcher=flagval(par,-1:-nFish,44)$value==i
-                  fish_params(par)[4,matcher]=fish_params(par)[4,matcher]*rnorm(1,1,sd)
+                    matcher=flagval(par,-1:-nFish,44)$value==i
+                    if (all(flagval(par,-1:-nfish,43)$value[matcher]==1){
+                        fish_params(par)[4,matcher]=fish_params(par)[4,matcher]*rnorm(1,1,sd)
+                    }
                 }
-              }
             }
-
 
             ## Age Pars
             ## 2 M deviations
