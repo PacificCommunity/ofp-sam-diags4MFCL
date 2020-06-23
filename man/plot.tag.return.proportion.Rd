@@ -7,7 +7,7 @@
 plot.tag.return.proportion(tagdat, plot.type = "point", save.dir, save.name)
 }
 \arguments{
-\item{tagdat}{Tagging data created by the \code{tag.data.preparation()} function.}
+\item{tagdat}{A data.frame of tagging data created by the \code{tag.data.preparation()} function.}
 
 \item{plot.type}{What type of plot: 'point' (default) or 'bar'.}
 
