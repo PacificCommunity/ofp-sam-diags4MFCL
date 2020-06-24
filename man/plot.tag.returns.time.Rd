@@ -27,7 +27,7 @@ plot.tag.returns.time(
 
 \item{plot.diff}{Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.}
 
-\item{scale.diff}{If TRUE, the difference between observed and predicted is scaled by the number of observed returns.}
+\item{scale.diff}{If TRUE, the difference between observed and predicted is scaled by the mean of observed returns.}
 
 \item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
 

@@ -10,7 +10,7 @@
 #' @param tagdat.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.
 #' @param recapture.groups A vector of the reference numbers of the tag recapture groups you want to plot.
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
-#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
+#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the mean of observed returns.
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param show.points Do you want to show points as well as the smoother for the difference plots? Default is FALSE.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
@@ -79,8 +79,8 @@ plot.tag.returns.time <- function(tagdat.list, tagdat.names=NULL, recapture.grou
     ylab <- "Observed - predicted recaptures"
     # Normalise
     if(scale.diff == TRUE){
-      # Rescale the diffs by the total recaptures in that group
-      pdat <- pdat[,.(Model=Model, recap.ts=recap.ts, diff = diff / sum(recap.obs, na.rm=TRUE)), by=.(tag_recapture_name)]
+      # Rescale the diffs by the mean recaptures in that group
+      pdat <- pdat[,.(Model=Model, recap.ts=recap.ts, diff = diff / mean(recap.obs, na.rm=TRUE)), by=.(tag_recapture_name)]
       ylab <- "Obs. - pred. recaptures (scaled)"
     }
     # Spoof up approriate y ranges for each facet using geom_blank()

@@ -10,7 +10,7 @@
 #' @param tagdat.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.
 #' @param facet What variable fo you want to group by: "none" (no grouping), "program" (by tagging program - default), "region" (by recapture region).
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
-#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the number of observed returns.
+#' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the mean number of observed returns.
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param show.points Do you want to show points as well as the smoother for the difference plots? Default is FALSE.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
@@ -61,9 +61,9 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
   if(scale.diff == TRUE){
     # Don't group by period at liberty - keep other choices
     grouping_names <- grouping_names[grouping_names!="period_at_liberty"] 
-    total_recaptured <- pdat[,.(total_obs_recap=sum(recap.obs, na.rm=TRUE)), by=mget(grouping_names)]
-    pdat <- merge(pdat, total_recaptured)
-    pdat$diff <- pdat$diff / pdat$total_obs_recap
+    mean_recaptured <- pdat[,.(mean_obs_recap=mean(recap.obs, na.rm=TRUE)), by=mget(grouping_names)]
+    pdat <- merge(pdat, mean_recaptured)
+    pdat$diff <- pdat$diff / pdat$mean_obs_recap
     ylab <- "Obs. - pred. recaptures (scaled)"
     }
   if (facet %in% c("none", "region")){
