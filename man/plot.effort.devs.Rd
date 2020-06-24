@@ -18,6 +18,10 @@ plot.effort.devs(
 )
 }
 \arguments{
+\item{frq.list}{A named list MFCLFrq objects that contain the observed effort data.}
+
+\item{par.list}{A named list of MFCLPar objects that contain the effort deviations.}
+
 \item{fisheries}{The numbers of the fisheries to plot.}
 
 \item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
@@ -31,10 +35,6 @@ plot.effort.devs(
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
 
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.}
-
-\item{frq}{An object of type MFCLFrq that contains the observed effort data.}
-
-\item{par}{An object of MFCLPar that contains the effort deviations.}
 
 \item{fishery_names}{The names of the fisheries to plot.}
 }
