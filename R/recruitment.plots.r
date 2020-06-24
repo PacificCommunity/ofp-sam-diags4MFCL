@@ -130,30 +130,52 @@ plot.rec.dist <- function(rep.list, rep.names=NULL, year_range = (as.numeric(ran
 #' 
 #' Plot estimated recruitment deviates for a single model, by quarter and region.
 #' A loess smoothed fit is shown.
-#' @param par An object of MFCLPar that contains the effort deviations.
+#' @param par.list A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
+#' @param par.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
+#' @param show.points Do you want to show points as well as the smoother for the difference plots? Default is FALSE.
+#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ... Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
 #' @importFrom ggplot2 scale_x_continuous
-plot.rec.devs <- function(par, save.dir, save.name){
-  if (class(par) != "MFCLPar"){
-    stop("par argument must of type of type 'MFCLPar'.")
-  }
-  pdat <- as.data.frame(region_rec_var(par))
+plot.rec.devs <- function(par.list, par.names=NULL, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  
+  # Check args
+  par.list <- check.par.args(par=par.list, par.names=par.names)
+  par.names <- names(par.list)
+  # Grab the region_rec_var per Model
+  recvars <- lapply(par.list, function(x) as.data.frame(region_rec_var(x)))
+  pdat <-  data.table::rbindlist(recvars, idcol="Model")
   pdat$area_name <- paste("Region ", pdat$area, sep="")
   pdat$season_name <- paste("Quarter ", pdat$season, sep="")
   
   year_axis_breaks <- seq(10*floor(min(pdat$year)/10), 10*ceiling(max(pdat$year)/10) , 20)
+  
+  colour_values <- palette.func(selected.model.names = names(par.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=year, y=data))
-  p <- p + ggplot2::geom_point()
+  if(show.points==TRUE){
+    p <- p + ggplot2::geom_point(aes(colour=Model))
+  }
+  if(length(par.list)==1){
+    p <- p + ggplot2::geom_smooth(colour="red", method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+  }
+  # Otherwise colour the smoother by model
+  if(length(par.list)>1){
+    p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
+  }
   p <- p + ggplot2::facet_grid(season_name ~ area_name, scales="free")
-  p <- p + ggplot2::geom_smooth(method = 'loess', formula = 'y~x', na.rm=TRUE)
   p <- p + ggplot2::geom_hline(ggplot2::aes(yintercept=0.0), linetype=2)
+  p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
   p <- p + ggplot2::xlab("Year") + ggplot2::ylab("Recruitment deviate")
   p <- p + ggplot2::scale_x_continuous(breaks=year_axis_breaks) 
   p <- p + ggthemes::theme_few()
+  if (show.legend==FALSE){
+    p <- p + theme(legend.position="none") 
+  }
   
   save_plot(save.dir, save.name, plot=p)
   
