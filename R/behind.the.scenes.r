@@ -56,46 +56,63 @@ check.tagdat.args <- function(tagdat, tagdat.names=NULL){
   return(tagdat)
 }
 
-# Internal function for checking the MFCLRep arguments
-# Substitute for doing S4 methods
-check.rep.args <- function(rep, rep.names=NULL){
-  bad_argument_types_message <- "The function is expecting an MFCLRep object, or a list of MFCLRep objects."
-  # If just a single MFCLRep coerce to an unamed list
-  if (class(rep) == "MFCLRep"){
-    rep <- list(rep)
+# Internal function for checking lists of MFCLX arguments
+check.list.args <- function(obj, obj.names=NULL, type){
+  # Could extend to other types
+  if (!(type %in% c("MFCLRep", "MFCLPar"))){
+    stop("type should be 'MFCLPar' or 'MFCLRep'")
   }
-  # If it is a list, check that all elements are an MFCLRep object, otherwise fail
-  if (class(rep) == "list"){
-    if(!all(lapply(rep, class)=="MFCLRep")){
+  
+  bad_argument_types_message <- paste("The function is expecting an ", type, " object, or a list of MFCLPar objects.", sep="")
+  
+  # If just a single object coerce to an unamed list
+  if (class(obj) == type){
+    obj <- list(obj)
+  }
+  # If it is a list, check that all elements are a type object, otherwise fail
+  if (class(obj) == "list"){
+    if(!all(lapply(obj, class)==type)){
       stop(bad_argument_types_message)
     }
   }
-  # If it's not a list of MFCLRep objects, fail
+  # If it's not a list of type objects, fail
   else {
       stop(bad_argument_types_message)
   }
   
-  # At this point rep is a list of MFCLRep objects
-  # If rep.names is supplied, then name the list - overwriting any existing names
-  if (!is.null(rep.names)){
-    # Check length of rep.names matches length of list
-    if(length(rep.names)!=length(rep)){
-      stop("Length of rep.names must match the number of MFCLRep objects.")
+  # At this point obj is a list of type objects
+  # If obj.names is supplied, then name the list - overwriting any existing names
+  if (!is.null(obj.names)){
+    # Check length of obj.names matches length of list
+    if(length(obj.names)!=length(obj)){
+      stop(paste("Length of obj.names must match the number of ", type, " objects.", sep=""))
     }
-    names(rep) <- rep.names
+    names(obj) <- obj.names
   }
   # If there are still no names, make some up
-  if(is.null(names(rep))){
-     fake_names <- paste("Model", seq(from=1, to=length(rep)), sep="") 
-     names(rep) <- fake_names
+  if(is.null(names(obj))){
+     fake_names <- paste("Model", seq(from=1, to=length(obj)), sep="") 
+     names(obj) <- fake_names
   }
-  return(rep)
+  return(obj)
 }
-## Some tests - could be added to unit tests if needed
+
+check.par.args <- function(par, par.names=NULL){
+  out <- check.list.args(obj=par, obj.names = par.names, type="MFCLPar")
+  return(out)
+}
+
+check.rep.args <- function(rep, rep.names=NULL){
+  out <- check.list.args(obj=rep, obj.names = rep.names, type="MFCLRep")
+  return(out)
+}
+
+# Some tests - could be added to unit tests if needed
 #rep1 <- MFCLRep()
 #rep2 <- MFCLRep()
 #rep3 <- MFCLRep()
 #par1 <- MFCLPar()
+#par2 <- MFCLPar()
 #
 #rep_list_named <- list(rep1=rep1, rep2=rep2, rep3=rep3)
 #rep_list_unnamed <- list(rep1, rep2, rep3)
