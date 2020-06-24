@@ -6,8 +6,8 @@
 #' Only effort deviations that have a corresponding effort in the 'frq' object are plotted.
 #' A loess smoothed fit is shown.
 #' 
-#' @param frq An object of type MFCLFrq that contains the observed effort data.
-#' @param par An object of MFCLPar that contains the effort deviations.
+#' @param frq.list A named list MFCLFrq objects that contain the observed effort data.
+#' @param par.list A named list of MFCLPar objects that contain the effort deviations.
 #' @param fisheries The numbers of the fisheries to plot.
 #' @param fishery_names The names of the fisheries to plot.
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
