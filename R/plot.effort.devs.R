@@ -36,7 +36,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.effort.devs <- function(frq.list, par.list, fisheries, fishery.names, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+plot.effort.devs <- function(frq.list, par.list, fisheries, fishery.names=fisheries, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   # Check input types - add more checks - farm out to external function
   if(class(frq.list) != "list"){
     frq.list <- list(frq.list)
@@ -104,7 +104,7 @@ plot.effort.devs <- function(frq.list, par.list, fisheries, fishery.names, show.
   frqreal[is.na(frqreal$effort),edev:=NA]
   pdat <- frqreal[fishery %in% fisheries]
   # Add in fishery names
-  fishery_names_df <- data.frame(fishery = fisheries, fishery_names = fishery_names)
+  fishery_names_df <- data.frame(fishery = fisheries, fishery_names = fishery.names)
   pdat <- merge(pdat, fishery_names_df)
   # Plot it up
   # Get yrange
