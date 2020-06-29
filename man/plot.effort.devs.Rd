@@ -7,8 +7,9 @@
 plot.effort.devs(
   frq.list,
   par.list,
+  model.names = NULL,
   fisheries,
-  fishery.names,
+  fishery.names = as.character(fisheries),
   show.legend = TRUE,
   show.points = FALSE,
   palette.func = default.model.colours,
@@ -18,9 +19,11 @@ plot.effort.devs(
 )
 }
 \arguments{
-\item{frq.list}{A named list MFCLFrq objects that contain the observed effort data.}
+\item{frq.list}{A list MFCLFrq objects or a single MFCLFrq object that contains the observed effort data.}
 
-\item{par.list}{A named list of MFCLPar objects that contain the effort deviations.}
+\item{par.list}{A list of MFCLPar objects or a single MFCLFrq that contain the effort deviations.}
+
+\item{model.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frq.list (if available) or generated automatically.}
 
 \item{fisheries}{The numbers of the fisheries to plot.}
 
@@ -36,7 +39,7 @@ plot.effort.devs(
 
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.}
 
-\item{fishery_names}{The names of the fisheries to plot.}
+\item{fishery_names}{The names of the fisheries to plot. If not supplied, the fishery numbers from the fisheries argument is used.}
 }
 \description{
 The effort deviations are in the 'par' object. The 'frq' object is needed to get the time series of fishing realisations.

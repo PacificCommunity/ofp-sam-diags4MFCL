@@ -6,10 +6,11 @@
 #' Only effort deviations that have a corresponding effort in the 'frq' object are plotted.
 #' A loess smoothed fit is shown.
 #' 
-#' @param frq.list A named list MFCLFrq objects that contain the observed effort data.
-#' @param par.list A named list of MFCLPar objects that contain the effort deviations.
+#' @param frq.list A list MFCLFrq objects or a single MFCLFrq object that contains the observed effort data.
+#' @param par.list A list of MFCLPar objects or a single MFCLFrq that contain the effort deviations.
+#' @param model.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frq.list (if available) or generated automatically.
 #' @param fisheries The numbers of the fisheries to plot.
-#' @param fishery_names The names of the fisheries to plot.
+#' @param fishery_names The names of the fisheries to plot. If not supplied, the fishery numbers from the fisheries argument is used.
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param show.points Do you want to show points as well as the smoother for the difference plots? Default is FALSE.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
@@ -36,23 +37,12 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.effort.devs <- function(frq.list, par.list, fisheries, fishery.names=fisheries, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
-  # Check input types - add more checks - farm out to external function
-  if(class(frq.list) != "list"){
-    frq.list <- list(frq.list)
-    names(frq.list)[1] <- "Model 1"
-  }
-  if(!all(unlist(lapply(frq.list, function(x) class(x)=="MFCLFrq")))){
-    stop("frq.list must be a named list of MFCLFreq objects")
-  }
-  
-  if(class(par.list) != "list"){
-    par.list <- list(par.list)
-    names(par.list)[1] <- "Model 1"
-  }
-  if(!all(unlist(lapply(par.list, function(x) class(x)=="MFCLPar")))){
-    stop("par.list must be a named list of MFCLPar objects")
-  }
+plot.effort.devs <- function(frq.list, par.list, model.names=NULL, fisheries, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  # Check input types
+  frq.list <- check.frq.args(frq=frq.list, frq.names=model.names)
+  frq.names <- names(frq.list)
+  par.list <- check.par.args(par=par.list, par.names=model.names)
+  par.names <- names(par.list)
   if(length(par.list) != length(frq.list)){
     stop("frq.list must be the same length as par.list")
   }
