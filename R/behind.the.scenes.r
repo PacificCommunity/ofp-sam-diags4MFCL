@@ -230,6 +230,29 @@ rainbow.model.colours <- function(selected.model.names, all.model.names=selected
   return(out)
 }
 
+
+# Groovy colors
+#' @rdname colour.palettes
+#' @export
+groovy.model.colours <- function(selected.model.names, all.model.names=selected.model.names, axis="A"){
+  palette.cols <- c("darkolivegreen1", "darkolivegreen4")
+  
+  axis.pos <- grep(axis, all.model.names[1])+1
+  nlev <- length(unique(as.numeric(unlist(lapply(selected.model.names, substr, axis.pos, axis.pos)))))
+  
+  cols <- colorRampPalette(palette.cols)(nlev)
+  out  <- rep(NA, length(selected.model.names))
+  for(lv in 0:nlev)
+    out[grep(paste0(axis,lv-1), selected.model.names)] <- cols[lv]
+  
+  names(out) <- all.model.names
+  out <- out[selected.model.names]
+  return(out)
+}
+
+
+
+
 # Internal function for checking the MFCLPar arguments
 # Substitute for doing S4 methods
 check.par.args <- function(par, par.names=NULL){
