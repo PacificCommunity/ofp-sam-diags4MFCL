@@ -29,7 +29,7 @@
 #' @importFrom ggplot2 scale_color_manual
 #' @importFrom ggplot2 theme
 
-plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legend=TRUE, palette.func=default.model.colours , xlab="Age (quarters)",ylab="Reproductive output", LegLoc="bottomright",save.dir, save.name, ...){
+plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legend=TRUE, palette.func=default.model.colours , xlab="Age class",ylab="Reproductive output", LegLoc="bottomright",save.dir, save.name, ...){
     pars <- check.par.args(par=pars, par.names=par.names)
     par.names <- names(pars)
 

@@ -11,7 +11,7 @@ plot.maturity(
   LnBins,
   show.legend = TRUE,
   palette.func = default.model.colours,
-  xlab = "Age (quarters)",
+  xlab = "Age class",
   ylab = "Reproductive output",
   LegLoc = "bottomright",
   save.dir,

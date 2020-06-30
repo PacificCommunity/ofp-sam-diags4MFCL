@@ -66,7 +66,7 @@ plot.growth = function(rep.list,rep.names=NULL, palette.func=default.model.colou
 			colour_values <- palette.func(selected.model.names = names(rep.list), ...)
 			g = plot.dt %>% 
 			ggplot2::ggplot() + ggthemes::theme_few() +
-			ggplot2::xlab("Age") + ggplot2::ylab("Length") +
+			ggplot2::xlab("Age class") + ggplot2::ylab("Length") +
 			ggplot2::ggtitle("Model growth") +
 			ggplot2::geom_ribbon(ggplot2::aes(x=age,ymin=lower,ymax=upper,fill=model),alpha=0.2) +
 			ggplot2::geom_line(ggplot2::aes(x=age,y=length,color=model),size=1.25) +

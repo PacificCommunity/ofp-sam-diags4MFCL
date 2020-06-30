@@ -52,7 +52,7 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 
 			if(sel.basis == "AGE")
 			{
-				xlab = "Age"
+				xlab = "Age class"
 				tmp.sel$x = tmp.sel$age
 					
 			} else {
