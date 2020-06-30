@@ -37,4 +37,6 @@ plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.di
   p
   
   save_plot(save.dir, save.name, plot=p)
+  
+  return(p)
 }
