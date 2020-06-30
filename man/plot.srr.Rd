@@ -7,6 +7,7 @@
 plot.srr(
   rep.list,
   rep.names = NULL,
+  show.legend = TRUE,
   palette.func = default.model.colours,
   save.dir,
   save.name,
@@ -14,6 +15,12 @@ plot.srr(
 )
 }
 \arguments{
+\item{rep.list}{A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.}
+
+\item{rep.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
+
+\item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
+
 \item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
@@ -21,8 +28,6 @@ plot.srr(
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
 
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
-
-\item{frq}{An object of type MFCLFrq that contains the observed effort data.}
 }
 \description{
 For each model, the fitted Beverton-Holt stock-recruiment relationship is plotted.
