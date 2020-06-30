@@ -7,7 +7,9 @@
 #' 
 #' For each model, the fitted Beverton-Holt stock-recruiment relationship is plotted.
 #' Estimated adult biomass and recruitment is also plotted.
-#' @param frq An object of type MFCLFrq that contains the observed effort data.
+#' @param rep.list A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
+#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
@@ -30,7 +32,7 @@
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_point
 #' 
-plot.srr <- function(rep.list, rep.names=NULL, palette.func=default.model.colours, save.dir, save.name, ...){
+plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, ...){
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)
@@ -60,6 +62,9 @@ plot.srr <- function(rep.list, rep.names=NULL, palette.func=default.model.colour
   p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
 	p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
 	p <- p + ggthemes::theme_few()
+  if (show.legend==FALSE){
+    p <- p + theme(legend.position="none") 
+  }
 	
   save_plot(save.dir, save.name, plot=p)
   
