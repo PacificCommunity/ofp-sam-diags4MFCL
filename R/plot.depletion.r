@@ -7,6 +7,8 @@
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param biomass.type Character string denoting the type of biomass plotted, 'SSB' or 'Total'
+#' @param LRP Limit reference point. If not specified it is not plotted.
+#' @param TRP Target reference point. If not specified it is not plotted.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
@@ -30,7 +32,7 @@
 #' @importFrom ggplot2 geom_hline
 #' 
 
-	plot.depletion = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", palette.func=default.model.colours, save.dir,save.name, ...)
+	plot.depletion = function(rep.list,rep.names=NULL,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB", LRP=NULL, TRP=NULL, palette.func=default.model.colours, save.dir,save.name, ...)
 	{
 	  
 	  # Check and sanitise input MFCLRep arguments and names
@@ -162,13 +164,19 @@
 			colour_values <- palette.func(selected.model.names = names(rep.list), ...)
 			g = plot.dt %>% 
 			ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~region) +
-			ggplot2::geom_hline(yintercept=c(0.2,0.4),color="gray70",linetype="longdash") +
+			#ggplot2::geom_hline(yintercept=c(0.2,0.4),color="gray70",linetype="longdash") +
 			ggplot2::geom_hline(yintercept=0) +
 			ggplot2::xlab("Year") +
 			ggplot2::scale_y_continuous(name=ylab,breaks = seq(0, 1, by = 0.20),limits=c(0,1)) +
 			ggplot2::ggtitle(paste0("Estimated depletion - ",mlab)) +
 			ggplot2::geom_line(ggplot2::aes(x=time,y=dep,color=model),size=1.25) +
 			ggplot2::scale_color_manual("Model",values=colour_values)
+			if (!is.null(LRP)){
+  			g <- g + ggplot2::geom_hline(yintercept=c(LRP),color="gray70",linetype="longdash")
+			}
+			if (!is.null(TRP)){
+  			g <- g + ggplot2::geom_hline(yintercept=c(TRP),color="gray70",linetype="longdash")
+			}
 		
 		# write.out
 		if(!missing(save.dir))

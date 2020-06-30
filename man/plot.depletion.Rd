@@ -10,6 +10,8 @@ plot.depletion(
   agg.years = TRUE,
   agg.regions = TRUE,
   biomass.type = "SSB",
+  LRP = NULL,
+  TRP = NULL,
   palette.func = default.model.colours,
   save.dir,
   save.name,
@@ -26,6 +28,10 @@ plot.depletion(
 \item{agg.regions}{TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.}
 
 \item{biomass.type}{Character string denoting the type of biomass plotted, 'SSB' or 'Total'}
+
+\item{LRP}{Limit reference point. If not specified it is not plotted.}
+
+\item{TRP}{Target reference point. If not specified it is not plotted.}
 
 \item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
 
