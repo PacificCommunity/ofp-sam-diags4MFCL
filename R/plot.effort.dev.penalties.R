@@ -11,6 +11,7 @@
 #' @param frq An object of type MFCLFrq that contains the observed effort data.
 #' @param par An object of MFCLPar that contains the effort deviations.
 #' @param fishery_map A data.frame that describes which fishery is fishing in which region and with which gear. The columns are: fishery_name, region, gear and fishery (the reference number). Only fisheries in the fishery_map will be plotted.
+#' @param fisheries Which fisheries to plot. Default is all of them.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
@@ -32,7 +33,7 @@
 #' @importFrom ggplot2 scale_color_gradient
 #' @importFrom ggplot2 scale_y_continuous
 #' 
-plot.effort.dev.penalties <- function(frq, par, fishery_map, save.dir, save.name){
+plot.effort.dev.penalties <- function(frq, par, fishery_map, fisheries = unique(fishery_map$fishery), save.dir, save.name){
   if (class(par) != "MFCLPar"){
     stop("par argument must of type of type 'MFCLPar'.")
   }
@@ -84,6 +85,7 @@ plot.effort.dev.penalties <- function(frq, par, fishery_map, save.dir, save.name
   # Set penalty to NA where effort is NA
   pdat$effpen <- ifelse(is.na(pdat$effort), NA, pdat$effpen)
   
+  pdat <- subset(pdat, fishery %in% fisheries)
   # Plot away
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=effpen))
   p <- p + ggplot2::geom_line(aes(colour=gear), na.rm=TRUE)

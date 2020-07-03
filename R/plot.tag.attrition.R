@@ -77,6 +77,11 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
   padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)), recap.region = sort(unique(pdat$recap.region)))
   pdat <- merge(pdat, padts, by=colnames(padts), all=TRUE)
   
+  
+  
+  # Want pdat to have Model names in the original order - important for plotting order
+  pdat[,Model:=factor(Model, levels=names(tagdat.list))]
+  
   # Time series
   if(plot.diff == FALSE){
     # For the observed and predicted recaptures, NA is essentially 0,

@@ -14,6 +14,7 @@ plot.maturity(
   xlab = "Age class",
   ylab = "Reproductive output",
   LegLoc = "bottomright",
+  linesize = 1,
   save.dir,
   save.name,
   ...
@@ -35,6 +36,8 @@ plot.maturity(
 \item{xlab}{Name to display on the x axis label}
 
 \item{ylab}{Name to display on the y axis label}
+
+\item{linesize}{Size of line.}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 

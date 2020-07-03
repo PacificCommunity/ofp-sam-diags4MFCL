@@ -80,6 +80,9 @@ plot.effort.devs <- function(frq.list, par.list, model.names=NULL, fisheries, fi
     stop("Length of effort devs does not match nrows of fishing realisations.")
   }
   # Force the order to be same as the effort devs so we can just unlist edevs in
+  # But I don't want to change the original model order
+  # (important for colouring - the last model needs to be visible in black)
+  # Set as factor in the actual plot
   data.table::setorder(frqreal, Model, fishery, ts)
   # Unlist and hope the order is right!
   frqreal$edev <- unlist(edevs)
@@ -101,6 +104,9 @@ plot.effort.devs <- function(frq.list, par.list, model.names=NULL, fisheries, fi
   ymax <- max(abs(pdat$edev), na.rm=TRUE)
   # Round it up to nearest 0.5
   ymax <- ceiling(ymax*2)/2
+  
+  # Want pdat to have Model names in the original order - important for plotting order
+  pdat[,Model:=factor(Model, levels=names(frq.list))]
   
   colour_values <- palette.func(selected.model.names = names(frq.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=edev))

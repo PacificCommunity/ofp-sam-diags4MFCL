@@ -3,6 +3,7 @@
 S3method(length,fit.preparation)
 export(colourblind.model.colours)
 export(default.model.colours)
+export(groovy.model.colours)
 export(jitter)
 export(likelihood.table)
 export(plot.biomass)

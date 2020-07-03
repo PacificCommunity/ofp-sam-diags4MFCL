@@ -7,8 +7,8 @@
 plot.movement.matrix(
   pars,
   par.names = NULL,
-  age.vec,
-  season.vec,
+  age.vec = NULL,
+  season.vec = NULL,
   save.dir,
   save.name
 )

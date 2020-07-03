@@ -73,6 +73,10 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 			{
 				plot.dt = plot.dt[fishery %in% fisheries]
 			}
+			
+			
+    # Want pdat to have Model names in the original order - important for plotting order
+    plot.dt[,Model:=factor(model, levels=names(rep.list))]
 
 		# make plot
 			# Get the colours - if all.model.names passed in using ... then it is passed to palette func

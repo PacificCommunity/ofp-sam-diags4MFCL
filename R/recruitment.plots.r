@@ -53,18 +53,32 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   params <- lapply(rep.list, function(x) c(srr(x)[c("a","b")]))
   bhdat <- data.frame(rec = unlist(lapply(params, function(x) (sb * x[1]/4) / (x[2]+sb))), sb=sb, qname = rep(rep.names, each=length(sb)))
   
+  # Want data to have Model names in the original order - important for plotting order
+  pdat$qname <- factor(pdat$qname, levels=names(rep.list))
+  bhdat$qname <- factor(bhdat$qname, levels=names(rep.list))
+  
 	colour_values <- palette.func(selected.model.names = names(rep.list), ...)
   # Plot everything
   p <- ggplot2::ggplot(pdat, aes(x=sb, y=rec))
-  p <- p + ggplot2::geom_point(aes(colour=qname))
+  p <- p + ggplot2::geom_point(aes(group=qname, colour=qname, fill=qname))
   p <- p + ggplot2::ylim(c(0,NA))
   p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb, y=rec, colour=qname), size=1.2)
   p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
 	p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
+	p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
 	p <- p + ggthemes::theme_few()
   if (show.legend==FALSE){
     p <- p + theme(legend.position="none") 
   }
+	
+	# Crappy hack to make the black points plot last because geom_point is not ordering by factor
+	if("black" %in% colour_values){
+	  black_model <- names(which(colour_values=="black"))
+	  black_dat <- subset(pdat, qname==black_model)
+    p <- p + ggplot2::geom_point(data=black_dat, aes(x=sb, y=rec), colour="black")
+	}
+	
+	
 	
   save_plot(save.dir, save.name, plot=p)
   
@@ -159,6 +173,9 @@ plot.rec.devs <- function(par.list, par.names=NULL, show.legend=TRUE, show.point
   pdat$season_name <- paste("Quarter ", pdat$season, sep="")
   
   year_axis_breaks <- seq(10*floor(min(pdat$year)/10), 10*ceiling(max(pdat$year)/10) , 20)
+  
+  # Want pdat to have Model names in the original order - important for plotting order
+  pdat[,Model:=factor(Model, levels=names(par.list))]
   
   colour_values <- palette.func(selected.model.names = names(par.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=year, y=data))

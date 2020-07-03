@@ -8,6 +8,7 @@ plot.nat.mort(
   rep.list,
   rep.names = NULL,
   show.legend = TRUE,
+  linesize = 1,
   palette.func = default.model.colours,
   save.dir,
   save.name,
@@ -20,6 +21,8 @@ plot.nat.mort(
 \item{rep.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
 
 \item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
+
+\item{linesize}{The size of the lines. Default is 1.}
 
 \item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
 
