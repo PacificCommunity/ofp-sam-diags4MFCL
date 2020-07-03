@@ -20,47 +20,106 @@ save_plot <- function(save.dir, save.name, plot, width = 9, height = 9){
 }
 		
 
-
-# Internal function for checking the MFCLRep arguments
+# Internal function for checking the tagdat arguments
 # Substitute for doing S4 methods
-check.rep.args <- function(rep, rep.names=NULL){
-  bad_argument_types_message <- "The function is expecting an MFCLRep object, or a list of MFCLRep objects."
-  # If just a single MFCLRep coerce to an unamed list
-  if (class(rep) == "MFCLRep"){
-    rep <- list(rep)
+check.tagdat.args <- function(tagdat, tagdat.names=NULL){
+  bad_argument_types_message <- "The function is expecting a tagdat data.frame, or a list of tagdat data.frames objects."
+  # If just a single data.frame coerce to an unamed list
+  if (class(tagdat) == "data.frame"){
+    tagdat <- list(tagdat)
   }
-  # If it is a list, check that all elements are an MFCLRep object, otherwise fail
-  if (class(rep) == "list"){
-    if(!all(lapply(rep, class)=="MFCLRep")){
+  # If it is a list, check that all elements are data.frames, otherwise fail
+  if (class(tagdat) == "list"){
+    if(!all(lapply(tagdat, class)=="data.frame")){
       stop(bad_argument_types_message)
     }
   }
-  # If it's not a list of MFCLRep objects, fail
+  # If it's not a list of data.frames, fail
   else {
       stop(bad_argument_types_message)
   }
   
-  # At this point rep is a list of MFCLRep objects
-  # If rep.names is supplied, then name the list - overwriting any existing names
-  if (!is.null(rep.names)){
+  # At this point rep is a list of data.frame objects
+  # If tagdat.names is supplied, then name the list - overwriting any existing names
+  if (!is.null(tagdat.names)){
     # Check length of rep.names matches length of list
-    if(length(rep.names)!=length(rep)){
-      stop("Length of rep.names must match the number of MFCLRep objects.")
+    if(length(tagdat.names)!=length(tagdat)){
+      stop("Length of tagdat.names must match the number of data.frames in list.")
     }
-    names(rep) <- rep.names
+    names(tagdat) <- tagdat.names
   }
   # If there are still no names, make some up
-  if(is.null(names(rep))){
-     fake_names <- paste("Model", seq(from=1, to=length(rep)), sep="") 
-     names(rep) <- fake_names
+  if(is.null(names(tagdat))){
+     fake_names <- paste("Model", seq(from=1, to=length(tagdat)), sep="") 
+     names(tagdat) <- fake_names
   }
-  return(rep)
+  return(tagdat)
 }
-## Some tests - could be added to unit tests if needed
+
+# Internal function for checking lists of MFCLX arguments
+check.list.args <- function(obj, obj.names=NULL, type){
+  # Could extend to other types
+  if (!(type %in% c("MFCLRep", "MFCLPar", "MFCLFrq"))){
+    stop("type should be 'MFCLPar', 'MFCLRep' or 'MFCLFrq'")
+  }
+  
+  bad_argument_types_message <- paste("The function is expecting an ", type, " object, or a list of ", type, " objects.", sep="")
+  
+  # If just a single object coerce to an unamed list
+  if (class(obj) == type){
+    obj <- list(obj)
+  }
+  # If it is a list, check that all elements are a type object, otherwise fail
+  if (class(obj) == "list"){
+    if(!all(lapply(obj, class)==type)){
+      stop(bad_argument_types_message)
+    }
+  }
+  # If it's not a list of type objects, fail
+  else {
+      stop(bad_argument_types_message)
+  }
+  
+  # At this point obj is a list of type objects
+  # If obj.names is supplied, then name the list - overwriting any existing names
+  if (!is.null(obj.names)){
+    # Check length of obj.names matches length of list
+    if(length(obj.names)!=length(obj)){
+      stop(paste("Length of obj.names must match the number of ", type, " objects.", sep=""))
+    }
+    names(obj) <- obj.names
+  }
+  # If there are still no names, make some up
+  if(is.null(names(obj))){
+     fake_names <- paste("Model", seq(from=1, to=length(obj)), sep="") 
+     names(obj) <- fake_names
+  }
+  return(obj)
+}
+
+check.par.args <- function(par, par.names=NULL){
+  out <- check.list.args(obj=par, obj.names = par.names, type="MFCLPar")
+  return(out)
+}
+
+check.rep.args <- function(rep, rep.names=NULL){
+  out <- check.list.args(obj=rep, obj.names = rep.names, type="MFCLRep")
+  return(out)
+}
+
+check.frq.args <- function(frq, frq.names=NULL){
+  out <- check.list.args(obj=frq, obj.names = frq.names, type="MFCLFrq")
+  return(out)
+}
+
+
+
+# Some tests - could be added to unit tests if needed
 #rep1 <- MFCLRep()
 #rep2 <- MFCLRep()
 #rep3 <- MFCLRep()
 #par1 <- MFCLPar()
+#par2 <- MFCLPar()
 #
 #rep_list_named <- list(rep1=rep1, rep2=rep2, rep3=rep3)
 #rep_list_unnamed <- list(rep1, rep2, rep3)
@@ -170,6 +229,29 @@ rainbow.model.colours <- function(selected.model.names, all.model.names=selected
   out <- out[selected.model.names]
   return(out)
 }
+
+
+# Groovy colors
+#' @rdname colour.palettes
+#' @export
+groovy.model.colours <- function(selected.model.names, all.model.names=selected.model.names, axis="A"){
+  palette.cols <- c("darkolivegreen1", "darkolivegreen4")
+  
+  axis.pos <- grep(axis, all.model.names[1])+1
+  nlev <- length(unique(as.numeric(unlist(lapply(selected.model.names, substr, axis.pos, axis.pos)))))
+  
+  cols <- colorRampPalette(palette.cols)(nlev)
+  out  <- rep(NA, length(selected.model.names))
+  for(lv in 0:nlev)
+    out[grep(paste0(axis,lv-1), selected.model.names)] <- cols[lv]
+  
+  names(out) <- all.model.names
+  out <- out[selected.model.names]
+  return(out)
+}
+
+
+
 
 # Internal function for checking the MFCLPar arguments
 # Substitute for doing S4 methods

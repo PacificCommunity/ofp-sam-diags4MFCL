@@ -4,20 +4,42 @@
 \alias{plot.effort.devs}
 \title{Plot effort deviations over time by fishery}
 \usage{
-plot.effort.devs(frq, par, fisheries, fishery_names, save.dir, save.name)
+plot.effort.devs(
+  frq.list,
+  par.list,
+  model.names = NULL,
+  fisheries,
+  fishery.names = as.character(fisheries),
+  show.legend = TRUE,
+  show.points = FALSE,
+  palette.func = default.model.colours,
+  save.dir,
+  save.name,
+  ...
+)
 }
 \arguments{
-\item{frq}{An object of type MFCLFrq that contains the observed effort data.}
+\item{frq.list}{A list MFCLFrq objects or a single MFCLFrq object that contains the observed effort data.}
 
-\item{par}{An object of MFCLPar that contains the effort deviations.}
+\item{par.list}{A list of MFCLPar objects or a single MFCLFrq that contain the effort deviations.}
+
+\item{model.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frq.list (if available) or generated automatically.}
 
 \item{fisheries}{The numbers of the fisheries to plot.}
 
-\item{fishery_names}{The names of the fisheries to plot.}
+\item{show.legend}{Do you want to show the plot legend, TRUE (default) or FALSE.}
+
+\item{show.points}{Do you want to show points as well as the smoother for the difference plots? Default is FALSE.}
+
+\item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
+
+\item{...}{Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.}
+
+\item{fishery_names}{The names of the fisheries to plot. If not supplied, the fishery numbers from the fisheries argument is used.}
 }
 \description{
 The effort deviations are in the 'par' object. The 'frq' object is needed to get the time series of fishing realisations.
