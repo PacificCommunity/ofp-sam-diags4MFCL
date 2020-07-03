@@ -5,6 +5,7 @@
 \alias{default.model.colours}
 \alias{colourblind.model.colours}
 \alias{rainbow.model.colours}
+\alias{groovy.model.colours}
 \title{Model palettes}
 \usage{
 default.model.colours(
@@ -20,6 +21,12 @@ colourblind.model.colours(
 rainbow.model.colours(
   selected.model.names,
   all.model.names = selected.model.names
+)
+
+groovy.model.colours(
+  selected.model.names,
+  all.model.names = selected.model.names,
+  axis = "A"
 )
 }
 \arguments{
