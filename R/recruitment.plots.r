@@ -217,13 +217,12 @@ plot.rec.devs <- function(par.list, par.names=NULL, show.legend=TRUE, show.point
 #' @importFrom ggplot2 geom_violin
 plot.rec.dist.decade <- function(rep, plot_type="violin", overlay_data=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   # Check and sanitise input MFCLRep arguments and names
-  rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
-  rep.names <- names(rep.list)
+  rep <- check.rep.args(rep=rep, rep.names=NULL)
 
-  if (length(rep.list) != 1) stop("You accidentally entered more than one MFCLRep object into this function. Try Again.")
+  if (length(rep) != 1) stop("You accidentally entered more than one MFCLRep object into this function. Try Again.")
 
-  dat <- as.data.frame(popN(rep.list[[1]])[1])
-  dat$total_rec <- c(areaSums(seasonSums(popN(rep.list[[1]])[1])))
+  dat <- as.data.frame(popN(rep[[1]])[1])
+  dat$total_rec <- c(areaSums(seasonSums(popN(rep[[1]])[1])))
   dat$prop_rec <- dat$data / dat$total_rec
 
   # Tidy up data
