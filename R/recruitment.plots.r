@@ -226,7 +226,6 @@ plot.rec.dist.decade <- function(rep, plot_type="violin", overlay_data=FALSE, pa
   dat$prop_rec <- dat$data / dat$total_rec
 
   # Tidy up data
-  dat$model <- rep(rep.names, each=dim(dat)[1] / length(rep.names))
   no_seasons <- length(unique(dat$season))
   no_areas <- length(unique(dat$area))
   dat$area_name <- paste("Region ", dat$area, sep="")
