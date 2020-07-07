@@ -12,7 +12,7 @@
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param xlab Name to display on the x axis label
 #' @param ylab Name to display on the y axis label
-#' @param LegLon legend location if show.legen is TRUE
+#' @param LegLoc legend location if show.legen is TRUE
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
@@ -60,7 +60,7 @@ plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legen
     if(show.legend==FALSE){
         p <- p + ggplot2::theme(legend.position = "none")
     } else {
-        p <- p + ggplot2::theme(legend.position = "LegLoc")
+        p <- p + ggplot2::theme(legend.position = LegLoc)
     }
 
     save_plot(save.dir, save.name, plot=p)
