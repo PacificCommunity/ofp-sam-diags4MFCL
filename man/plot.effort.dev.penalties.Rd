@@ -5,7 +5,7 @@
 \title{Plot effort deviation penalties over time by fishery and region}
 \usage{
 plot.effort.dev.penalties(
-  frq,
+  frqreal,
   par,
   fishery_map,
   fisheries = unique(fishery_map$fishery),
@@ -14,7 +14,7 @@ plot.effort.dev.penalties(
 )
 }
 \arguments{
-\item{frq}{An object of type MFCLFrq that contains the observed effort data.}
+\item{frqreal}{A data.frame created by running realisations() on an object of type MFCLFrq.}
 
 \item{par}{An object of MFCLPar that contains the effort deviations.}
 

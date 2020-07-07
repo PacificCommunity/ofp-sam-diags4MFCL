@@ -5,7 +5,7 @@
 \title{Plot effort deviations over time by fishery}
 \usage{
 plot.effort.devs(
-  frq.list,
+  frqreal.list,
   par.list,
   model.names = NULL,
   fisheries,
@@ -19,11 +19,11 @@ plot.effort.devs(
 )
 }
 \arguments{
-\item{frq.list}{A list MFCLFrq objects or a single MFCLFrq object that contains the observed effort data.}
+\item{frqreal.list}{A list of, or single instance of, data.frames, each one from calling realisations() on an MFCLFrq.}
 
 \item{par.list}{A list of MFCLPar objects or a single MFCLFrq that contain the effort deviations.}
 
-\item{model.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frq.list (if available) or generated automatically.}
+\item{model.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frqreal.list (if available) or generated automatically.}
 
 \item{fisheries}{The numbers of the fisheries to plot.}
 

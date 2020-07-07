@@ -8,7 +8,7 @@
 #' Otherwise, if the penalty for effort deviations flag (fish flag 13) is less than 0, the penalty is calculated as the square root of the normalised effort multiplied by the absolute value of the effort deviations flag, by fishery.
 #' If the penalty for effort deviations flag (fish flag 13) is greater than or equal to 0, the penalty is set to the value of the effort deviations flag, by fishery.
 #' Observations with missing effort have no penalty.
-#' @param frq An object of type MFCLFrq that contains the observed effort data.
+#' @param frqreal A data.frame created by running realisations() on an object of type MFCLFrq.
 #' @param par An object of MFCLPar that contains the effort deviations.
 #' @param fishery_map A data.frame that describes which fishery is fishing in which region and with which gear. The columns are: fishery_name, region, gear and fishery (the reference number). Only fisheries in the fishery_map will be plotted.
 #' @param fisheries Which fisheries to plot. Default is all of them.
@@ -33,15 +33,15 @@
 #' @importFrom ggplot2 scale_color_gradient
 #' @importFrom ggplot2 scale_y_continuous
 #' 
-plot.effort.dev.penalties <- function(frq, par, fishery_map, fisheries = unique(fishery_map$fishery), save.dir, save.name){
+plot.effort.dev.penalties <- function(frqreal, par, fishery_map, fisheries = unique(fishery_map$fishery), save.dir, save.name){
   if (class(par) != "MFCLPar"){
     stop("par argument must of type of type 'MFCLPar'.")
   }
-  if (class(frq) != "MFCLFrq"){
-    stop("frq argument must of type of type 'MFCLFrq'.")
+  if (class(frqreal) != "data.frame"){
+    stop("frqreal argument must a data.frame after calling realisations() on an 'MFCLFrq' object.")
   }
   # Get the fishery realisations and tidy up
-  frqreal <- realisations(frq)
+  #frqreal <- realisations(frq)
   # Add timestep column for plotting - ignoring week
   frqreal$ts <- frqreal$year + (frqreal$month-1)/12 + 1/24  # month is mid-month
   # Tidy up missing values
@@ -57,7 +57,8 @@ plot.effort.dev.penalties <- function(frq, par, fishery_map, fisheries = unique(
   # Pull out fishflag 66 (time varying effort wt)
   #tmp <- ifelse(parfl$ffl[, 13] == 0, 10, parfl$ffl[, 13])
   #tmp1 <- parfl$ffl[, 66]
-  no_fisheries <- n_fisheries(frq)
+  #no_fisheries <- n_fisheries(frqreal)
+  no_fisheries <- length(unique(frqreal$fishery))
   ff13 <- flagval(par, -(1:no_fisheries), 13)$value
   # Replace 0 penalty with penalty of 10 - why?
   ff13[ff13==0] <- 10

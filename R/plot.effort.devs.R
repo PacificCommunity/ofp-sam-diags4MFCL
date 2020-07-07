@@ -6,9 +6,9 @@
 #' Only effort deviations that have a corresponding effort in the 'frq' object are plotted.
 #' A loess smoothed fit is shown.
 #' 
-#' @param frq.list A list MFCLFrq objects or a single MFCLFrq object that contains the observed effort data.
+#' @param frqreal.list A list of, or single instance of, data.frames, each one from calling realisations() on an MFCLFrq.
 #' @param par.list A list of MFCLPar objects or a single MFCLFrq that contain the effort deviations.
-#' @param model.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frq.list (if available) or generated automatically.
+#' @param model.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the frqreal.list (if available) or generated automatically.
 #' @param fisheries The numbers of the fisheries to plot.
 #' @param fishery_names The names of the fisheries to plot. If not supplied, the fishery numbers from the fisheries argument is used.
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
@@ -37,22 +37,21 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.effort.devs <- function(frq.list, par.list, model.names=NULL, fisheries, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+plot.effort.devs <- function(frqreal.list, par.list, model.names=NULL, fisheries, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   # Check input types
-  frq.list <- check.frq.args(frq=frq.list, frq.names=model.names)
-  frq.names <- names(frq.list)
+  frqreal.list <- check.frqreal.args(frqreal=frqreal.list, frqreal.names=model.names)
+  frq.names <- names(frqreal.list)
   par.list <- check.par.args(par=par.list, par.names=model.names)
   par.names <- names(par.list)
-  if(length(par.list) != length(frq.list)){
-    stop("frq.list must be the same length as par.list")
+  if(length(par.list) != length(frqreal.list)){
+    stop("frqreal.list must be the same length as par.list")
   }
   
   # Each fishery has different number edevs - based on realisations
   # Time steps given by frq file
   # This is repeated from the plot.pred.obs.cpue() plot - could farm out to function?
   # Extract the fishing realisations with observed catch, effort and penalty data
-  real_list <- lapply(frq.list, realisations) 
-  frqreal <- data.table::rbindlist(real_list, idcol="Model")
+  frqreal <- data.table::rbindlist(frqreal.list, idcol="Model")
   # Add timestep column for plotting - ignoring week
   frqreal$ts <- frqreal$year + (frqreal$month-1)/12 + 1/24  # month is mid-month
   # Tidy up missing values
@@ -106,20 +105,20 @@ plot.effort.devs <- function(frq.list, par.list, model.names=NULL, fisheries, fi
   ymax <- ceiling(ymax*2)/2
   
   # Want pdat to have Model names in the original order - important for plotting order
-  pdat[,Model:=factor(Model, levels=names(frq.list))]
+  pdat[,Model:=factor(Model, levels=names(frqreal.list))]
   
-  colour_values <- palette.func(selected.model.names = names(frq.list), ...)
+  colour_values <- palette.func(selected.model.names = names(frqreal.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=edev))
   if(show.points==TRUE){
     p <- p + ggplot2::geom_point(aes(colour=Model), na.rm=TRUE, alpha=0.6)
     p <- p + ggplot2::ylim(c(-ymax,ymax))
   }
   # If just one model - colour the smoother red
-  if(length(frq.list)==1){
+  if(length(frqreal.list)==1){
     p <- p + ggplot2::geom_smooth(colour="red", method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
   }
   # Otherwise colour the smoother by model
-  if(length(frq.list)>1){
+  if(length(frqreal.list)>1){
     p <- p + ggplot2::geom_smooth(aes(colour=Model), method = 'loess', formula = 'y~x', na.rm=TRUE, se=FALSE)
   }
   p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
