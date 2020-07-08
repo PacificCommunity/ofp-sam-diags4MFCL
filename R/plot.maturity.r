@@ -10,9 +10,10 @@
 #' @param LnBins a vector of length bin values
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
+#' @param linesize Size of line.
 #' @param xlab Name to display on the x axis label
 #' @param ylab Name to display on the y axis label
-#' @param LegLon legend location if show.legen is TRUE
+#' @param LegLoc legend location if show.legen is TRUE
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
@@ -29,7 +30,7 @@
 #' @importFrom ggplot2 scale_color_manual
 #' @importFrom ggplot2 theme
 
-plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legend=TRUE, palette.func=default.model.colours , xlab="Age class",ylab="Reproductive output", LegLoc="bottomright",save.dir, save.name, ...){
+plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legend=TRUE, palette.func=default.model.colours , xlab="Age class",ylab="Reproductive output", LegLoc="bottomright", linesize=1, save.dir, save.name, ...){
     pars <- check.par.args(par=pars, par.names=par.names)
     par.names <- names(pars)
 
@@ -49,10 +50,14 @@ plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legen
         })
     }
     dat <- do.call("rbind", dat)
+    
+    # Want dat to have Model names in the original order - important for plotting order
+    dat$model <- factor(dat$model, levels=names(pars))
+    
     # Plot it
     colour_values <- palette.func(selected.model.names = names(pars), ...)
     p <- ggplot2::ggplot(dat, ggplot2::aes(x=var, y=mat))
-    p <- p + ggplot2::geom_line(ggplot2::aes(colour=model))
+    p <- p + ggplot2::geom_line(ggplot2::aes(colour=model), size=linesize)
     p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
     p <- p + ggplot2::xlab(xlab) + ggplot2::ylab(ylab)
     p <- p + ggplot2::coord_cartesian(ylim=c(0,1.05))
@@ -60,7 +65,7 @@ plot.maturity <- function (pars, par.names=NULL, Length=FALSE,LnBins, show.legen
     if(show.legend==FALSE){
         p <- p + ggplot2::theme(legend.position = "none")
     } else {
-        p <- p + ggplot2::theme(legend.position = "LegLoc")
+        p <- p + ggplot2::theme(legend.position = LegLoc)
     }
 
     save_plot(save.dir, save.name, plot=p)

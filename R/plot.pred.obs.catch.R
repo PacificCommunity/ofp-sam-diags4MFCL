@@ -49,6 +49,9 @@ plot.pred.obs.catch <- function(rep.list, rep.names=NULL, fisheries, fishery_nam
   # Why do I need to specify by?
   pdat <- merge(pdat, fishery_names_df, by="fishery")
   
+  # Want pdat to have Model names in the original order - important for plotting order
+  pdat[,Model:=factor(Model, levels=names(rep.list))]
+  
   # Plot it
   colour_values <- palette.func(selected.model.names = names(rep.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=diff))

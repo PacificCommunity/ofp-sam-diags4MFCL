@@ -23,7 +23,7 @@ plot.tag.attrition(
 
 \item{tagdat.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.}
 
-\item{facet}{What variable fo you want to group by: "none" (no grouping), "program" (by tagging program - default), "region" (by recapture region).}
+\item{facet}{What variable do you want to group by: "none" (no grouping), "program" (by tagging program - default), "region" (by recapture region).}
 
 \item{plot.diff}{Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.}
 

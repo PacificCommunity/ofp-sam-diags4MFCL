@@ -57,6 +57,11 @@ plot.tag.returns.time <- function(tagdat.list, tagdat.names=NULL, recapture.grou
   # Careful here as recapture_group gets filled with NAs
   pdat <- merge(pdat, padts, all=TRUE, by=colnames(padts))
   
+  
+  # Want pdat to have Model names in the original order - important for plotting order
+  pdat[,Model:=factor(Model, levels=names(tagdat.list))]
+  
+  
   # Mathew's plot. Time series of predicted and observed
   if(plot.diff == FALSE){
     # For the observed and predicted recaptures, NA is essentially 0,

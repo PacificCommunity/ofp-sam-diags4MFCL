@@ -8,9 +8,10 @@
 #' Otherwise, if the penalty for effort deviations flag (fish flag 13) is less than 0, the penalty is calculated as the square root of the normalised effort multiplied by the absolute value of the effort deviations flag, by fishery.
 #' If the penalty for effort deviations flag (fish flag 13) is greater than or equal to 0, the penalty is set to the value of the effort deviations flag, by fishery.
 #' Observations with missing effort have no penalty.
-#' @param frq An object of type MFCLFrq that contains the observed effort data.
+#' @param frqreal A data.frame created by running realisations() on an object of type MFCLFrq.
 #' @param par An object of MFCLPar that contains the effort deviations.
 #' @param fishery_map A data.frame that describes which fishery is fishing in which region and with which gear. The columns are: fishery_name, region, gear and fishery (the reference number). Only fisheries in the fishery_map will be plotted.
+#' @param fisheries Which fisheries to plot. Default is all of them.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
@@ -32,15 +33,15 @@
 #' @importFrom ggplot2 scale_color_gradient
 #' @importFrom ggplot2 scale_y_continuous
 #' 
-plot.effort.dev.penalties <- function(frq, par, fishery_map, save.dir, save.name){
+plot.effort.dev.penalties <- function(frqreal, par, fishery_map, fisheries = unique(fishery_map$fishery), save.dir, save.name){
   if (class(par) != "MFCLPar"){
     stop("par argument must of type of type 'MFCLPar'.")
   }
-  if (class(frq) != "MFCLFrq"){
-    stop("frq argument must of type of type 'MFCLFrq'.")
+  if (class(frqreal) != "data.frame"){
+    stop("frqreal argument must a data.frame after calling realisations() on an 'MFCLFrq' object.")
   }
   # Get the fishery realisations and tidy up
-  frqreal <- realisations(frq)
+  #frqreal <- realisations(frq)
   # Add timestep column for plotting - ignoring week
   frqreal$ts <- frqreal$year + (frqreal$month-1)/12 + 1/24  # month is mid-month
   # Tidy up missing values
@@ -56,7 +57,8 @@ plot.effort.dev.penalties <- function(frq, par, fishery_map, save.dir, save.name
   # Pull out fishflag 66 (time varying effort wt)
   #tmp <- ifelse(parfl$ffl[, 13] == 0, 10, parfl$ffl[, 13])
   #tmp1 <- parfl$ffl[, 66]
-  no_fisheries <- n_fisheries(frq)
+  #no_fisheries <- n_fisheries(frqreal)
+  no_fisheries <- length(unique(frqreal$fishery))
   ff13 <- flagval(par, -(1:no_fisheries), 13)$value
   # Replace 0 penalty with penalty of 10 - why?
   ff13[ff13==0] <- 10
@@ -84,6 +86,7 @@ plot.effort.dev.penalties <- function(frq, par, fishery_map, save.dir, save.name
   # Set penalty to NA where effort is NA
   pdat$effpen <- ifelse(is.na(pdat$effort), NA, pdat$effpen)
   
+  pdat <- subset(pdat, fishery %in% fisheries)
   # Plot away
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=effpen))
   p <- p + ggplot2::geom_line(aes(colour=gear), na.rm=TRUE)
