@@ -24,7 +24,7 @@
 #' @importFrom ggplot2 scale_fill_gradient2
 #' 
 
-plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,save.name)
+plot.movement.matrix = function(pars,par.names=NULL, age.vec=NULL, season.vec=NULL, save.dir,save.name)
 {
 	pars = check.par.args(par=pars, par.names=par.names)
     par.names = names(pars)
@@ -35,9 +35,9 @@ plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,
     	 move.coef.1 = data.table::as.data.table(diff_coffs_age_period(pars[[1]]))
     	 move.coef.2 = data.table::as.data.table(diff_coffs_age_period(pars[[2]]))
 
-		if(missing(age.vec))
+		if(is.null(age.vec))
 		{
-			if(missing(season.vec))
+			if(is.null(season.vec))
 			{				
 				move.coef.1 = move.coef.1[,.(value=mean(value)),by=.(from,to)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 				move.coef.2 = move.coef.2[,.(value=mean(value)),by=.(from,to)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
@@ -46,7 +46,7 @@ plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,
 				move.coef.2 = move.coef.2[period %in%season.vec,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
 			}
 		} else {
-			if(missing(season.vec))
+			if(is.null(season.vec))
 			{
 				move.coef.1 = move.coef.1[age %in%age.vec,.(value=mean(value)),by=.(from,to,age)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 				move.coef.2 = move.coef.2[age %in%age.vec,.(value=mean(value)),by=.(from,to,age)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
@@ -66,16 +66,16 @@ plot.movement.matrix = function(pars,par.names=NULL,age.vec,season.vec,save.dir,
     } else if(length(pars)==1){
     	move.coef = data.table::as.data.table(diff_coffs_age_period(pars[[1]]))
 
-		if(missing(age.vec))
+		if(is.null(age.vec))
 		{
-			if(missing(season.vec))
+			if(is.null(season.vec))
 			{
 				move.coef = move.coef[,.(value=mean(value)),by=.(from,to)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 			} else {
 				move.coef = move.coef[period %in%season.vec,.(value=mean(value)),by=.(from,to,period)] %>% .[,age:="All ages"] %>% .[,age:=factor(age)] %>% .[,period:=factor(as.character(period),levels=sort(unique(period)))]
 			}
 		} else {
-			if(missing(season.vec))
+			if(is.null(season.vec))
 			{
 				move.coef = move.coef[age %in%age.vec,.(value=mean(value)),by=.(from,to,age)] %>% .[,age:=factor(as.character(age),levels=sort(unique(age)))] %>% .[,period:="All seasons"] %>% .[,period:=factor(period)]
 			} else {

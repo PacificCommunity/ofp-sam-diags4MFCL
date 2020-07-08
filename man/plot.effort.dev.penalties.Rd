@@ -4,14 +4,23 @@
 \alias{plot.effort.dev.penalties}
 \title{Plot effort deviation penalties over time by fishery and region}
 \usage{
-plot.effort.dev.penalties(frq, par, fishery_map, save.dir, save.name)
+plot.effort.dev.penalties(
+  frqreal,
+  par,
+  fishery_map,
+  fisheries = unique(fishery_map$fishery),
+  save.dir,
+  save.name
+)
 }
 \arguments{
-\item{frq}{An object of type MFCLFrq that contains the observed effort data.}
+\item{frqreal}{A data.frame created by running realisations() on an object of type MFCLFrq.}
 
 \item{par}{An object of MFCLPar that contains the effort deviations.}
 
 \item{fishery_map}{A data.frame that describes which fishery is fishing in which region and with which gear. The columns are: fishery_name, region, gear and fishery (the reference number). Only fisheries in the fishery_map will be plotted.}
+
+\item{fisheries}{Which fisheries to plot. Default is all of them.}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 

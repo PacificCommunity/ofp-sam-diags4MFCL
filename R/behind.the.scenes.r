@@ -59,8 +59,8 @@ check.tagdat.args <- function(tagdat, tagdat.names=NULL){
 # Internal function for checking lists of MFCLX arguments
 check.list.args <- function(obj, obj.names=NULL, type){
   # Could extend to other types
-  if (!(type %in% c("MFCLRep", "MFCLPar", "MFCLFrq"))){
-    stop("type should be 'MFCLPar', 'MFCLRep' or 'MFCLFrq'")
+  if (!(type %in% c("MFCLRep", "MFCLPar", "MFCLFrq", "data.frame"))){
+    stop("type should be 'MFCLPar', 'MFCLRep' or 'MFCLFrq' or 'data.frame' from realisations() of 'MFCLFreq'")
   }
   
   bad_argument_types_message <- paste("The function is expecting an ", type, " object, or a list of ", type, " objects.", sep="")
@@ -111,6 +111,12 @@ check.frq.args <- function(frq, frq.names=NULL){
   out <- check.list.args(obj=frq, obj.names = frq.names, type="MFCLFrq")
   return(out)
 }
+
+check.frqreal.args <- function(frqreal, frqreal.names=NULL){
+  out <- check.list.args(obj=frqreal, obj.names = frqreal.names, type="data.frame")
+  return(out)
+}
+
 
 
 
