@@ -38,11 +38,10 @@
 #' 
 
 plot.effort.devs <- function(frqreal.list, par.list, model.names=NULL, fisheries, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  
   # Check input types
   frqreal.list <- check.frqreal.args(frqreal=frqreal.list, frqreal.names=model.names)
-  frq.names <- names(frqreal.list)
   par.list <- check.par.args(par=par.list, par.names=model.names)
-  par.names <- names(par.list)
   if(length(par.list) != length(frqreal.list)){
     stop("frqreal.list must be the same length as par.list")
   }
@@ -81,8 +80,11 @@ plot.effort.devs <- function(frqreal.list, par.list, model.names=NULL, fisheries
   # Force the order to be same as the effort devs so we can just unlist edevs in
   # But I don't want to change the original model order
   # (important for colouring - the last model needs to be visible in black)
+  
+  # This setting of order makes the order of frq different to that of par because we don't have them as factors yet
   # Set as factor in the actual plot
-  data.table::setorder(frqreal, Model, fishery, ts)
+  # data.table::setorder(frqreal, Model, fishery, ts)
+  
   # Unlist and hope the order is right!
   frqreal$edev <- unlist(edevs)
   # Sanity check
