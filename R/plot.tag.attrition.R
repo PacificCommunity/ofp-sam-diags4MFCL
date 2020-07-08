@@ -2,13 +2,13 @@
 # Similar to Figs 28 and 29 in SKJ
 
 #' Plot the observed and predicted tag attrition.
-#' 
+#'
 #' Plot the observed and predicted tag recaptures against time at liberty by tagging program, or all tagging programs combined.
 #' The plot is either a time series of the difference between the observed and predicted, or a time series of the recaptures.
 #' A loess smoother is put through the differences.
 #' @param tagdat.list A list, or an individual data.frame, of tagging data created by the \code{tag.data.preparation()} function.
 #' @param tagdat.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the tagdat.list (if available) or generated automatically.
-#' @param facet What variable fo you want to group by: "none" (no grouping), "program" (by tagging program - default), "region" (by recapture region).
+#' @param facet What variable do you want to group by: "none" (no grouping), "program" (by tagging program - default), "region" (by recapture region).
 #' @param plot.diff Do you want to plot the difference between the observed and predicted, or a time series of recaptures? TRUE (default) or FALSE.
 #' @param scale.diff If TRUE, the difference between observed and predicted is scaled by the mean number of observed returns.
 #' @param show.legend Do you want to show the plot legend, TRUE (default) or FALSE.
@@ -21,29 +21,29 @@
 #' @import FLR4MFCL
 #' @import magrittr
 plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
-  
+
   # Check facet arguments
   if (!(facet %in% c("none", "program", "region"))){
     stop("facet argument must be 'none', 'program' or 'region'")
   }
-  
+
   # If not plotting the difference don't scale it
   if(plot.diff == FALSE){
     scale.diff <- FALSE
   }
-  
+
   # Sort out the list of inputs
-  tagdat.list <- check.tagdat.args(tagdat.list, tagdat.names) 
+  tagdat.list <- check.tagdat.args(tagdat.list, tagdat.names)
   # If plotting time series of actuals, can only plot one model at a time
   if(plot.diff == FALSE & length(tagdat.list) != 1){
     stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagdat list.")
   }
   # Collapse into a single data.table
   tagdat <- data.table::rbindlist(tagdat.list, idcol="Model")
-  
+
   # Y lab for the difference plot without scaling - overwritten if scaled
   ylab <- "Observed - predicted recaptures"
-  
+
   # Sum number of tags by period at liberty
   # Depends if we want to process by tag program
   if (facet=="none"){
@@ -55,12 +55,12 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
   if (facet=="region"){
     grouping_names <- c("Model", "period_at_liberty", "recap.region")
   }
-  
+
   pdat <- tagdat[, .(recap.obs=sum(recap.obs, na.rm=TRUE), recap.pred=sum(recap.pred, na.rm=TRUE)) ,by=mget(grouping_names)]
   pdat$diff <- pdat$recap.obs - pdat$recap.pred
   if(scale.diff == TRUE){
     # Don't group by period at liberty - keep other choices
-    grouping_names <- grouping_names[grouping_names!="period_at_liberty"] 
+    grouping_names <- grouping_names[grouping_names!="period_at_liberty"]
     mean_recaptured <- pdat[,.(mean_obs_recap=mean(recap.obs, na.rm=TRUE)), by=mget(grouping_names)]
     pdat <- merge(pdat, mean_recaptured)
     pdat$diff <- pdat$diff / pdat$mean_obs_recap
@@ -72,11 +72,11 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
   if (facet %in% c("none", "program")){
     pdat$recap.region <- "All recapture regions"
   }
-  
+
   # Need to pad out time series to avoid missing missing periods at liberty
   padts <- expand.grid(period_at_liberty = seq(from=min(pdat$period_at_liberty), to=max(pdat$period_at_liberty), by= 1), program = sort(unique(pdat$program)), recap.region = sort(unique(pdat$recap.region)))
   pdat <- merge(pdat, padts, by=colnames(padts), all=TRUE)
-  
+
   # Time series
   if(plot.diff == FALSE){
     # For the observed and predicted recaptures, NA is essentially 0,
@@ -97,20 +97,20 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
     p <- p + ggplot2::ylim(c(0,NA))
     p <- p + ggthemes::theme_few()
   }
-  
+
   # Residuals - can by multiple models
   if(plot.diff == TRUE){
     colour_values <- palette.func(selected.model.names = names(tagdat.list), ...)
     # Get dummy data to set nice looking symmetrical ylims
     # Drop Model from grouping_name
-    grouping_names <- grouping_names[grouping_names!="Model"] 
+    grouping_names <- grouping_names[grouping_names!="Model"]
     dummydat <- pdat[,.(y = c(max(abs(diff), na.rm=T), -max(abs(diff), na.rm=T))), mget(grouping_names)]
     dummydat$x <- rep(c(min(pdat$period_at_liberty), max(pdat$period_at_liberty)), nrow(dummydat)/2)
     # Start...
     p <- ggplot2::ggplot(pdat, aes(x=period_at_liberty, y=diff))
     # If only 1 model, draw points and turn off legend
     # Ensure symetrical y-axes only works when not showing points
-    # https://stackoverflow.com/questions/9789871/method-to-extract-stat-smooth-line-fit 
+    # https://stackoverflow.com/questions/9789871/method-to-extract-stat-smooth-line-fit
     if (show.points==TRUE){
       p <- p + ggplot2::geom_point(aes(colour=Model))
       p <- p + ggplot2::geom_blank(data=dummydat, aes(x=x, y=y))
@@ -128,11 +128,11 @@ plot.tag.attrition <- function(tagdat.list, tagdat.names=NULL, facet="program", 
     p <- p + ggplot2::xlab("Periods at liberty (quarters)")
     p <- p + ggthemes::theme_few()
     if (show.legend==FALSE){
-      p <- p + theme(legend.position="none") 
+      p <- p + theme(legend.position="none")
     }
   }
-  
+
   save_plot(save.dir, save.name, plot=p)
-  
+
   return(p)
 }
