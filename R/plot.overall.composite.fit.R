@@ -20,7 +20,7 @@ plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.di
   pdat <- subset(lfit, fishery %in% fisheries)
   
   # Bring in the fishery names
-  fishery_names_df <- data.frame(fishery = fisheries, fishery_names = factor(fishery_names,levels=unique(fishery_names[sort(fisheries)])))
+  fishery_names_df <- data.frame(fishery = fisheries, fishery_names = fishery_names)
   pdat <- merge(pdat, fishery_names_df)
   
   bar_width <- pdat$length[2] - pdat$length[1]
