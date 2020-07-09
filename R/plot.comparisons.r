@@ -43,7 +43,7 @@ plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = T
 			{
 				fisheries.edev = 1:max(sapply(rep.list,function(x)dimensions(x)["fisheries"]))
 			}
-			g5 = plot.effort.devs(frqreal.list, par.list, model.names, fisheries=fisheries.edev, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("edev-",save.name), ...)
+			g5 = plot.effort.devs(lapply(frqreal.list,function(x)realisations(x)), par.list, model.names, fisheries=fisheries.edev, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("edev-",save.name), ...)
 			g6 = plot.srr(rep.list, model.names, show.legend=TRUE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("srr-",save.name), ...)
 			if(is.null(recdist.year_range))
 			{
