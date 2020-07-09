@@ -40,7 +40,7 @@ prepare.tag.returns.time.v2(
 
 generate.plot.tag.returns.time.v2(
   pdat,
-  model_names,
+  model_names = unique(pdat$Model),
   recapture.groups,
   plot.diff = TRUE,
   scale.diff = TRUE,

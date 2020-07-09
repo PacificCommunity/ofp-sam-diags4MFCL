@@ -103,7 +103,7 @@ prepare.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, names=NULL
 #' @export
 #' @rdname plot.tag.returns.time.v2
 #' @name Plot tag returns time
-generate.plot.tag.returns.time.v2 <- function(pdat, model_names, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+generate.plot.tag.returns.time.v2 <- function(pdat, model_names=unique(pdat$Model), recapture.groups, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   
   # If not plotting the difference don't scale it
   if(plot.diff == FALSE){
