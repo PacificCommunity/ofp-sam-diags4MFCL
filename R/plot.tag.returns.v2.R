@@ -73,14 +73,14 @@ plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, fishery.map, 
   # observations, even if NA.
   # This is a right pain in the bum - must be an easier way
   # Need to pad out time series
-  no_seasons <- length(unique(tagrep.list[[1]]$recap.month)) # this is unsafe, how best to get no seasons?
+  no_seasons <- length(unique(tagrelease.list[[1]]$recap.month)) # this is unsafe, how best to get no seasons?
   padts <- expand.grid(recap.ts = seq(from=min(pdat$recap.ts), to=max(pdat$recap.ts), by= 1 / no_seasons), tag_recapture_name = sort(unique(pdat$tag_recapture_name)), Model=sort(unique(pdat$Model)))
   # Bring in the recapture name
   # Careful here as recapture_group gets filled with NAs
   pdat <- merge(pdat, padts, all=TRUE, by=colnames(padts))
   
   # Want pdat to have Model names in the original order - important for plotting order
-  pdat[,Model:=factor(Model, levels=names(tagrep.list))]
+  pdat[,Model:=factor(Model, levels=names(tagrelease.list))]
   
   # Mathew's plot. Time series of predicted and observed
   if(plot.diff == FALSE){
