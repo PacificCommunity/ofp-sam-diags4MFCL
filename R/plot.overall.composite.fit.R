@@ -29,7 +29,7 @@ plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.di
   # Observed as barchart
   p <- p + geom_bar(aes(y=obs), fill="blue", colour="blue", stat="identity", width=bar_width)
   # Predicted as red line
-  p <- p + geom_line(aes(y=pred), colour="red", size=2)
+  p <- p + geom_line(aes(y=pred), colour="red", size=1)
   if(is.null(ncol))
   {
       p <- p + facet_wrap(~fishery_names, scales="free")
