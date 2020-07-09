@@ -10,11 +10,12 @@
 #' @param fishery_names The names of the fisheries to plot.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ncol Number of columns to plot across. Default is ggplot2 default.
+#' @param xlab Label for the xaxis.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.dir, save.name){
-  
+plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.dir, save.name, ncol=NULL,xlab="Length (cm)"){
   # Subset out the desired fisheris
   pdat <- subset(lfit, fishery %in% fisheries)
   
@@ -28,15 +29,20 @@ plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.di
   # Observed as barchart
   p <- p + geom_bar(aes(y=obs), fill="blue", colour="blue", stat="identity", width=bar_width)
   # Predicted as red line
-  p <- p + geom_line(aes(y=pred), colour="red", size=2)
-  p <- p + facet_wrap(~fishery_names, scales="free", ncol=2)
+  p <- p + geom_line(aes(y=pred), colour="red", size=1)
+  if(is.null(ncol))
+  {
+      p <- p + facet_wrap(~fishery_names, scales="free")
+  } else {
+      p <- p + facet_wrap(~fishery_names, scales="free", ncol=ncol)
+  }
   p <- p + xlab("Length (cm)") + ylab("Samples")
   p <- p + ggthemes::theme_few()
   # Tighten the axes
   p <- p + scale_y_continuous(expand = c(0, 0))
   p
   
-  save_plot(save.dir, save.name, plot=p)
+  save_plot(save.dir, save.name, plot=p, width = 16, height = 9)
   
   return(p)
 }

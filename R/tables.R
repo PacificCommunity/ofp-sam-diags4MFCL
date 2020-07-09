@@ -7,9 +7,10 @@
 #' The output can be processed with the \code{xtable} package to make a table for RMarkdown or Latex reports.
 #' @param likelihood.list A named list of MFCLLikelihood objects (from reading in the 'test_plot_output' files), one for each model.
 #' @param par.list A named list of MFCLPar objects, the same length and names as the likelihoods argument. If this argument is not supplied, the 'grad' column is not included in the returned data.frame.
+#' @param npars Boolean, if TRUE also returns the number of parameters. Default is FALSE
 #' @export
 #' @import FLR4MFCL
-likelihood.table <- function(likelihood.list, par.list){
+likelihood.table <- function(likelihood.list, par.list,npars=FALSE){
   # Need to add some safety checks here for the object types
   
   # Scrape the likelihoods out of the list of likelihoods
@@ -35,9 +36,19 @@ likelihood.table <- function(likelihood.list, par.list){
   # Add in the grad column if available
   if(!missing(par.list)){
     max_grads <- unlist(lapply(par.list, max_grad))
-    # Cannot assume order of the par list is the same as the likelihood list so safer to merge
-    max_grad_df <- data.frame(Model=names(max_grads), maxgrad = max_grads)
-    colnames(max_grad_df)[colnames(max_grad_df)=="maxgrad"] <- "Max Gradient"
+    if(npars)
+    {
+      npars <- unlist(lapply(par.list, n_pars))
+      # Cannot assume order of the par list is the same as the likelihood list so safer to merge
+      max_grad_df <- data.frame(Model=names(max_grads), maxgrad = max_grads, npar = n_pars)
+      colnames(max_grad_df)[colnames(max_grad_df)=="maxgrad"] <- "Max Gradient"
+      colnames(max_grad_df)[colnames(max_grad_df)=="npar"] <- "Parameters"
+    } else {
+        # Cannot assume order of the par list is the same as the likelihood list so safer to merge
+      max_grad_df <- data.frame(Model=names(max_grads), maxgrad = max_grads)
+      colnames(max_grad_df)[colnames(max_grad_df)=="maxgrad"] <- "Max Gradient"
+    }
+    
     lldf <- merge(lldf, max_grad_df)
   }
   return(lldf)

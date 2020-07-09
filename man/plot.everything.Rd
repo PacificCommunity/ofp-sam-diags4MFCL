@@ -10,6 +10,7 @@ plot.everything(
   parname = NULL,
   fdescloc = NULL,
   outdir = NULL,
+  tag.rep.groups = NULL,
   ...
 )
 }
@@ -21,6 +22,8 @@ plot.everything(
 \item{fdescloc}{optional location of fdesc.txt file that contains information for labels of figures if not included within the folder. the fdesc.txt is a file with 7 columns and an entry for each fishery in the model. The columns should be named 1. num 2. gear_long  3. method  4. code  5. gear 6. flag 7. region. This file creates all of the labels for the fisheries.}
 
 \item{outdir}{An optional directory path that tells where the figures are to be saved. The function will automatically create a directory called DiagnosticPlots within dir if not provided an outdir.}
+
+\item{tag.rep.groups}{Optional. Provide a character vector of names for the tag reporting groups.}
 
 \item{...}{Additional parameters that can be fed to the palette? Not functional}
 

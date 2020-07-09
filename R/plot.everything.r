@@ -8,12 +8,13 @@
 #' @param fdescloc optional location of fdesc.txt file that contains information for labels of figures if not included within the folder. the fdesc.txt is a file with 7 columns and an entry for each fishery in the model. The columns should be named 1. num 2. gear_long  3. method  4. code  5. gear 6. flag 7. region. This file creates all of the labels for the fisheries.
 #' @param par optional name of par file you you want plotted otherwise finds and uses largest number value
 #' @param outdir An optional directory path that tells where the figures are to be saved. The function will automatically create a directory called DiagnosticPlots within dir if not provided an outdir.
+#' @param tag.rep.groups Optional. Provide a character vector of names for the tag reporting groups.
 #' @param ... Additional parameters that can be fed to the palette? Not functional
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
 
-plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=NULL,...){
+plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=NULL,tag.rep.groups=NULL,...){
     ## check if last value in string is '/' if is not add it in
     if (substr(rundir,nchar(rundir),nchar(rundir))!='/') rundir=paste0(rundir,'/')
     olddir=getwd()
@@ -93,6 +94,9 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
         plot.tag.return.proportion(prepTag,plot.type="point",save.dir=outdir,save.name="TagPropRegionPoint")
         plot.tag.return.proportion(prepTag,plot.type="point",save.dir=outdir,save.name="TagPropRegionBar")
 
+        plot.tag.reporting.rates(par, grp.names = tag.rep.groups, save.dir=outdir,save.name="TagRepRates")
+
+
     } else {
         print('There is no tag file in the rundir supplied')
     }
@@ -103,14 +107,14 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
     if ( file.exists('length.fit')) {
         prepLen=length.fit.preparation('length.fit')
         tmpfsh=unique(prepLen$fishery[prepLen$obs>0])
-        plot.overall.composition.fit(prepLen,tmpfsh,labels$code[tmpfsh],outdir,"LengthCompFit")
+        plot.overall.composition.fit(prepLen,tmpfsh,labels$code[tmpfsh],outdir,"LengthCompFit",xlab="Length (cm)")
         rm(tmpfsh)
     }
 
     if ( file.exists('weight.fit')) {
         prepWt=length.fit.preparation('weight.fit')
         tmpfsh=unique(prepWt$fishery[prepWt$obs>0])
-        plot.overall.composition.fit(prepWt,tmpfsh,labels$code[tmpfsh],outdir,"WeightCompFit")
+        plot.overall.composition.fit(prepWt,tmpfsh,labels$code[tmpfsh],outdir,"WeightCompFit",xlab="Weight (kg)")
         rm(tmpfsh)
     }
 
@@ -131,11 +135,11 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
 
     ## Plot the effort penalty specified within the frq file
     fisheryMap = data.frame(fishery=1:Nfish,fishery_name=labels$code,region=labels$region,gear=labels$gear)
-    plot.effort.dev.penalties(frq,par,fisheryMap,outdir,"EffortDevPenalties")
+    plot.effort.dev.penalties(realisations(frq),par,fisheryMap,save.dir=outdir,save.name="EffortDevPenalties")
     tmpfsh=which(flagval(par, -(1:Nfish), 66)$value > 0)
 
     ## Plot the effort deviates for the standardized fisheries
-    plot.effort.devs(frq,par,fisheries=tmpfsh,fishery.names=labels$code[tmpfsh],show.legend=FALSE,show.points=TRUE,save.dir=outdir,save.name="EffortDevs")
+    plot.effort.devs(list(realisations(frq)),par,fisheries=tmpfsh,fishery.names=labels$code[tmpfsh],show.legend=FALSE,show.points=TRUE,save.dir=outdir,save.name="EffortDevs")
     ##plot.frqit
     ## Growth curve
     plot.growth(rep,save.dir=outdir,save.name="MeanLengthAge")
@@ -170,7 +174,7 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
 
     ## Plot Stock recruitment relationship
     plot.srr(rep,show.legend=FALSE,save.dir=outdir,save.name="SRR")
-    ## status.table(rep)
+    ## status.table(rep)    
 
 
 
