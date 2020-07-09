@@ -103,14 +103,14 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
     if ( file.exists('length.fit')) {
         prepLen=length.fit.preparation('length.fit')
         tmpfsh=unique(prepLen$fishery[prepLen$obs>0])
-        plot.overall.composition.fit(prepLen,tmpfsh,labels$code[tmpfsh],outdir,"LengthCompFit")
+        plot.overall.composition.fit(prepLen,tmpfsh,labels$code[tmpfsh],outdir,"LengthCompFit",xlab="Length (cm)")
         rm(tmpfsh)
     }
 
     if ( file.exists('weight.fit')) {
         prepWt=length.fit.preparation('weight.fit')
         tmpfsh=unique(prepWt$fishery[prepWt$obs>0])
-        plot.overall.composition.fit(prepWt,tmpfsh,labels$code[tmpfsh],outdir,"WeightCompFit")
+        plot.overall.composition.fit(prepWt,tmpfsh,labels$code[tmpfsh],outdir,"WeightCompFit",xlab="Weight (kg)")
         rm(tmpfsh)
     }
 
