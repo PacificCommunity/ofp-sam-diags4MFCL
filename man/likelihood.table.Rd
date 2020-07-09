@@ -4,12 +4,14 @@
 \alias{likelihood.table}
 \title{Table of likelihood components}
 \usage{
-likelihood.table(likelihood.list, par.list)
+likelihood.table(likelihood.list, par.list, npars = FALSE)
 }
 \arguments{
 \item{likelihood.list}{A named list of MFCLLikelihood objects (from reading in the 'test_plot_output' files), one for each model.}
 
 \item{par.list}{A named list of MFCLPar objects, the same length and names as the likelihoods argument. If this argument is not supplied, the 'grad' column is not included in the returned data.frame.}
+
+\item{npars}{Boolean, if TRUE also returns the number of parameters. Default is FALSE}
 }
 \description{
 Returns a data.frame of the likelihood components. The likelihoods are taken from the 'test_plot_output' file which is output as part of the model fitting process.
