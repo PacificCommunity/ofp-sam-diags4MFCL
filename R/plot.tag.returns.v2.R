@@ -20,6 +20,8 @@
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.names to ensure consistency of model colours when plotting a subset of models.
 #' @export
+#' @rdname plot.tag.returns.time.v2
+#' @name Plot tag returns time
 #' @import FLR4MFCL
 #' @import magrittr
 #' @importFrom data.table data.table
@@ -29,13 +31,9 @@
 # 
 # 
 # Without tagdat.list but with individual elements
-plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, fishery.map, names=NULL, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, names=NULL, fishery.map, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
   
-  # If not plotting the difference don't scale it
-  if(plot.diff == FALSE){
-    scale.diff <- FALSE
-  }
-  
+  # Argument checking etc.
   tagrelease.list <- check.tagrelease.args(tagrelease.list, names) 
   tagrep.list <- check.tagrep.args(tagrep.list, names) 
   
@@ -44,15 +42,32 @@ plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, fishery.map, 
     stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagrelease list.")
   }
   
+  # Two stages with two functions:
+  # Prepare the data
+  pdat <- prepare.tag.returns.time.v2(tagrelease.list = tagrelease.list, tagrep.list = tagrep.list, names=names, fishery.map = fishery.map)
+  
+  # Generate plot
+  p <- generate.plot.tag.returns.time.v2(pdat=pdat, model_names=names(tagrelease.list), recapture.groups=recapture.groups, plot.diff=plot.diff, scale.diff=scale.diff, show.legend=show.legend, show.points=show.points, palette.func=palette.func, save.dir=save.dir, save.name=save.name, ...)
+  
+  return(p)
+  
+}
+
+#' @export
+#' @rdname plot.tag.returns.time.v2
+#' @name Plot tag returns time
+prepare.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, names=NULL, fishery.map, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  
+  tagrelease.list <- check.tagrelease.args(tagrelease.list, names) 
+  tagrep.list <- check.tagrep.args(tagrep.list, names) 
+  
   # Collapse recaptures into a single data.table
   tagrep <- data.table::rbindlist(tagrep.list, idcol="Model")
-  # Clean up
-  rm(tagrep.list)
   # Bring in tag_recapture_group and name
   colnames(fishery.map)[colnames(fishery.map)=="fishery"] <- "recap.fishery"
   tagrep <- merge(tagrep, fishery.map[,c("recap.fishery", "tag_recapture_group", "tag_recapture_name")])
-  # Drop recapture groups we don't want
-  tagrep <- tagrep[tag_recapture_group %in% recapture.groups,]
+  # Drop recapture groups we don't want - do in the engine plot
+  # tagrep <- tagrep[tag_recapture_group %in% recapture.groups,]
   # Make a timestep column
   tagrep$recap.ts <- tagrep$recap.year + (tagrep$recap.month-1)/12 + 1/24
   # Drop columns we don't need for space
@@ -73,14 +88,38 @@ plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, fishery.map, 
   # observations, even if NA.
   # This is a right pain in the bum - must be an easier way
   # Need to pad out time series
-  no_seasons <- length(unique(tagrelease.list[[1]]$recap.month)) # this is unsafe, how best to get no seasons?
+  no_seasons <- length(unique(tagrelease.list[[1]]$rel.month)) # unsafe, how best to get no seasons?
   padts <- expand.grid(recap.ts = seq(from=min(pdat$recap.ts), to=max(pdat$recap.ts), by= 1 / no_seasons), tag_recapture_name = sort(unique(pdat$tag_recapture_name)), Model=sort(unique(pdat$Model)))
-  # Bring in the recapture name
-  # Careful here as recapture_group gets filled with NAs
+  # Bring in recapture name and group
+  padts <- merge(padts, fishery.map[c("tag_recapture_group", "tag_recapture_name")])
   pdat <- merge(pdat, padts, all=TRUE, by=colnames(padts))
   
-  # Want pdat to have Model names in the original order - important for plotting order
-  pdat[,Model:=factor(Model, levels=names(tagrelease.list))]
+  return(pdat)
+}
+  
+  
+#' @param pdat The output from calling prepare.plot.tag.returns.time.v2
+#' @param model_names Names of the models to be plotted and ordered by.
+#' @export
+#' @rdname plot.tag.returns.time.v2
+#' @name Plot tag returns time
+generate.plot.tag.returns.time.v2 <- function(pdat, model_names, recapture.groups, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  
+  # If not plotting the difference don't scale it
+  if(plot.diff == FALSE){
+    scale.diff <- FALSE
+  }
+  
+  # If plotting time series of actuals, can only plot one model at a time
+  if(plot.diff == FALSE & length(model_names) != 1){
+    stop("If plotting actual observed and predicted attrition of (not the difference between them) you can only plot one model at a time. Try subsetting your tagrelease list.")
+  }
+  
+  # Subset recapture.groups and models
+  pdat <- pdat[(tag_recapture_group %in% recapture.groups) & (Model %in% model_names),]
+  
+  # Want pdat to have Model names in a specific order - important for plotting order
+  pdat[,Model:=factor(Model, levels=model_names)]
   
   # Mathew's plot. Time series of predicted and observed
   if(plot.diff == FALSE){
@@ -98,7 +137,7 @@ plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, fishery.map, 
   
   
   if(plot.diff == TRUE){
-    colour_values <- palette.func(selected.model.names = names(tagrelease.list), ...)
+    colour_values <- palette.func(selected.model.names = model_names, ...)
     # Or plot the difference - need to scale by number of recaptures?
     pdat$diff <- pdat$recap.obs - pdat$recap.pred
     ylab <- "Observed - predicted recaptures"
