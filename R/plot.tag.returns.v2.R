@@ -46,6 +46,8 @@ plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, fishery.map, 
   
   # Collapse recaptures into a single data.table
   tagrep <- data.table::rbindlist(tagrep.list, idcol="Model")
+  # Clean up
+  rm(tagrep.list)
   # Bring in tag_recapture_group and name
   colnames(fishery.map)[colnames(fishery.map)=="fishery"] <- "recap.fishery"
   tagrep <- merge(tagrep, fishery.map[,c("recap.fishery", "tag_recapture_group", "tag_recapture_name")])
