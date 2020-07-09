@@ -5,14 +5,16 @@
 \title{Wrapper function for plotting model comparisons}
 \usage{
 plot.comparisons(
-  plot.name,
   rep.list,
+  frq.list,
+  par.list,
   model.names,
   agg.years = TRUE,
   agg.regions = TRUE,
-  sel.basis = "AGE",
   biomass.type = "SSB",
   biomass.units = 1000,
+  fisheries.edev = NULL,
+  recdist.year_range = NULL,
   yaxis.free = FALSE,
   palette.func = default.model.colours,
   save.dir,
@@ -23,17 +25,23 @@ plot.comparisons(
 \arguments{
 \item{rep.list}{A list of MFCLRep objects. The reference model should be listed first.}
 
+\item{frq.list}{A list of MFCLFrq objects}
+
+\item{par.list}{A list of MFCLPar objects}
+
 \item{model.names}{A vector of character strings naming the models for plotting purposes}
 
 \item{agg.years}{TRUE or FALSE. Should model outputs be aggregated to an annual time step.}
 
 \item{agg.regions}{TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.}
 
-\item{sel.basis}{A character string indicating if selectivity at age ('AGE') or length ('Length') should be plotted}
-
 \item{biomass.type}{Character string denoting the type of biomass plotted, 'SSB' or 'Total'}
 
 \item{biomass.units}{Integer number denoting how many MT to divide the biomass by. Default is 1000.}
+
+\item{fisheries.edev}{A vector of fishery indices to plot for the effort devs}
+
+\item{recdist.year_range}{The year range to average the total recruitment over. Default is the last 10 years.}
 
 \item{yaxis.free}{TRUE or FALSE. Default is FALSE. If TRUE and agg.regions is also TRUE than the y-axis scales will be independent across regions, otherwise they will be shared so regional scaling will be apparent.}
 
