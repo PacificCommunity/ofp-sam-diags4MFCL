@@ -34,7 +34,7 @@ plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = T
 			g2 = plot.biomass(rep.list,model.names,agg.years,agg.regions=FALSE,biomass.type,biomass.units,yaxis.free,palette.func,save.dir,save.name=paste0("bio.reg-",save.name),...)
 			if(agg.regions)
 			{
-				g11 = plot.depletion(rep.list,model.names,agg.years,agg.regions=TRUE,biomass.type,palette.func,save.dir,save.name=paste0("dep-",save.name),...)
+				g11 = plot.depletion(rep.list,model.names,agg.years,agg.regions=TRUE,biomass.type=biomass.type,LRP=LRP,TRP=TRP,palette.func=palette.func,save.dir=save.dir,save.name=paste0("dep-",save.name),...)
 				g22 = plot.biomass(rep.list,model.names,agg.years,agg.regions=TRUE,biomass.type,biomass.units,yaxis.free,palette.func,save.dir,save.name=paste0("bio-",save.name),...)
 			} 
 			
