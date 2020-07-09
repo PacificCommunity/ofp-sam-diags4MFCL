@@ -43,7 +43,7 @@ plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = T
 			{
 				fisheries.edev = 1:max(sapply(rep.list,function(x)dimensions(x)["fisheries"]))
 			}
-			g5 = plot.effort.devs(lapply(frqreal.list,function(x)realisations(x)), par.list, model.names, fisheries=fisheries.edev, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("edev-",save.name), ...)
+			g5 = plot.effort.devs(lapply(frq.list,function(x)realisations(x)), par.list, model.names, fisheries=fisheries.edev, fishery.names=as.character(fisheries), show.legend=TRUE, show.points=FALSE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("edev-",save.name), ...)
 			g6 = plot.srr(rep.list, model.names, show.legend=TRUE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("srr-",save.name), ...)
 			if(is.null(recdist.year_range))
 			{
@@ -52,7 +52,7 @@ plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = T
 			g7 = plot.rec.dist(rep.list, model.names, year_range = recdist.year_range, plot_type="violin", overlay_data=FALSE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("rec.dist-",save.name), ...)
 			g8 = plot.rec.devs(par.list, model.names, show.legend=TRUE, show.points=FALSE, palette.func=palette.func, save.dir=save.dir,save.name=paste0("rec.dev-",save.name), ...)
 			g9 = plot.nat.mort(rep.list, model.names, show.legend=TRUE, linesize = 1, palette.func=palette.func, save.dir=save.dir,save.name=paste0("nat.M-",save.name), ...)
-			LnBins = seq(from=lf_range(frqreal.list[[1]])["LFFirst"],by=lf_range(frqreal.list[[1]])["LFWidth"]*lf_range(frqreal.list[[1]])["LFFactor"],length.out=lf_range(frqreal.list[[1]])["LFIntervals"])
+			LnBins = seq(from=lf_range(frq.list[[1]])["LFFirst"],by=lf_range(frq.list[[1]])["LFWidth"]*lf_range(frq.list[[1]])["LFFactor"],length.out=lf_range(frq.list[[1]])["LFIntervals"])
 			g10 = plot.maturity(par.list, model.names, Length=FALSE,LnBins=LnBins, show.legend=TRUE, palette.func=palette.func , xlab="Age class",ylab="Reproductive output", LegLoc="bottomright", linesize=1, save.dir=save.dir,save.name=paste0("mat.age-",save.name), ...)	
 			g11 = plot.maturity(par.list, model.names, Length=TRUE,LnBins=LnBins, show.legend=TRUE, palette.func=palette.func , xlab="Length class",ylab="Reproductive output", LegLoc="bottomright", linesize=1, save.dir=save.dir,save.name=paste0("mat.len-",save.name), ...)	
 
