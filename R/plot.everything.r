@@ -131,7 +131,7 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
 
     ## Plot the effort penalty specified within the frq file
     fisheryMap = data.frame(fishery=1:Nfish,fishery_name=labels$code,region=labels$region,gear=labels$gear)
-    plot.effort.dev.penalties(realisations(frq),par,fisheryMap,outdir,"EffortDevPenalties")
+    plot.effort.dev.penalties(realisations(frq),par,fisheryMap,save.dir=outdir,save.name="EffortDevPenalties")
     tmpfsh=which(flagval(par, -(1:Nfish), 66)$value > 0)
 
     ## Plot the effort deviates for the standardized fisheries

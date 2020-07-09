@@ -36,7 +36,7 @@ plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.di
   p <- p + scale_y_continuous(expand = c(0, 0))
   p
   
-  save_plot(save.dir, save.name, plot=p)
+  save_plot(save.dir, save.name, plot=p, width = 16, height = 9)
   
   return(p)
 }
