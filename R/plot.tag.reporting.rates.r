@@ -32,7 +32,7 @@ plot.tag.reporting.rates = function(par, grp.names = NULL, save.dir, save.name)
   upper.bound = subset(flags(par),flagtype==1&flag==33)$value/100
   tag.dt = data.table::as.data.table(tag.dt) %>% .[order(group)] %>% .[,ub:=prior_mean+1.96*prior_mean*prior_cv] %>%
            .[,lb:=prior_mean-1.96*prior_mean*prior_cv] %>%
-           .[,lb:=ifelse(lb<0,0,lb)] %>% .[,ub:=ifelse(ub>upper.bound,upper.bound,ub)]
+           .[,lb:=ifelse(lb<0,0,lb)] %>% .[,ub:=ifelse(ub>1,1,ub)]
 
 
   if(is.null(grp.names))
