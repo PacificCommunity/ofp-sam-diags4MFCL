@@ -11,6 +11,8 @@
 #' @param fisheries.edev A vector of fishery indices to plot for the effort devs
 #' @param recdist.year_range The year range to average the total recruitment over. Default is the last 10 years.
 #' @param yaxis.free TRUE or FALSE. Default is FALSE. If TRUE and agg.regions is also TRUE than the y-axis scales will be independent across regions, otherwise they will be shared so regional scaling will be apparent.  
+#' @param LRP Limit reference point. If not specified it is not plotted.
+#' @param TRP Target reference point. If not specified it is not plotted.
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #' @param save.dir Path to the directory where the outputs will be saved
@@ -19,7 +21,7 @@
 #' @import FLR4MFCL
 #' 
 
-plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",biomass.units=1000,fisheries.edev=NULL,recdist.year_range=NULL,yaxis.free=FALSE,palette.func=default.model.colours,save.dir,save.name,...)
+plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = TRUE,agg.regions=TRUE,biomass.type = "SSB",biomass.units=1000,fisheries.edev=NULL,recdist.year_range=NULL,yaxis.free=FALSE,LRP=NULL, TRP=NULL,palette.func=default.model.colours,save.dir,save.name,...)
 {
 	if(!missing(save.dir))
 	{
@@ -28,7 +30,7 @@ plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = T
 			stop("How can you save the output if you haven't specified the name? Please specify 'save.name'.")
 		} else {
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-			g1 = plot.depletion(rep.list,model.names,agg.years,agg.regions=FALSE,biomass.type,palette.func,save.dir,save.name=paste0("dep.reg-",save.name),...)
+			g1 = plot.depletion(rep.list,model.names,agg.years,agg.regions=FALSE,biomass.type=biomass.type,LRP=LRP,TRP=TRP,palette.func=palette.func,save.dir=save.dir,save.name=paste0("dep.reg-",save.name),...)
 			g2 = plot.biomass(rep.list,model.names,agg.years,agg.regions=FALSE,biomass.type,biomass.units,yaxis.free,palette.func,save.dir,save.name=paste0("bio.reg-",save.name),...)
 			if(agg.regions)
 			{
