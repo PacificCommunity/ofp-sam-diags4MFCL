@@ -9,7 +9,9 @@ plot.overall.composition.fit(
   fisheries,
   fishery_names,
   save.dir,
-  save.name
+  save.name,
+  ncol = NULL,
+  xlab = "Length (cm)"
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ plot.overall.composition.fit(
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
+
+\item{ncol}{Number of columns to plot across. Default is ggplot2 default.}
+
+\item{xlab}{Label for the xaxis.}
 }
 \description{
 Plot composite (all time periods combined) observed and predicted catch-at-length for each fishery.

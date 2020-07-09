@@ -10,16 +10,17 @@
 #' @param fishery_names The names of the fisheries to plot.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param ncol Number of columns to plot across. Default is ggplot2 default.
+#' @param xlab Label for the xaxis.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.dir, save.name){
-  
+plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.dir, save.name, ncol=NULL,xlab="Length (cm)"){
   # Subset out the desired fisheris
   pdat <- subset(lfit, fishery %in% fisheries)
   
   # Bring in the fishery names
-  fishery_names_df <- data.frame(fishery = fisheries, fishery_names = fishery_names)
+  fishery_names_df <- data.frame(fishery = fisheries, fishery_names = factor(fishery_names,levels=unique(fishery_names[sort(fisheries)])))
   pdat <- merge(pdat, fishery_names_df)
   
   bar_width <- pdat$length[2] - pdat$length[1]
@@ -29,7 +30,12 @@ plot.overall.composition.fit <- function(lfit, fisheries, fishery_names, save.di
   p <- p + geom_bar(aes(y=obs), fill="blue", colour="blue", stat="identity", width=bar_width)
   # Predicted as red line
   p <- p + geom_line(aes(y=pred), colour="red", size=2)
-  p <- p + facet_wrap(~fishery_names, scales="free", ncol=2)
+  if(is.null(ncol))
+  {
+      p <- p + facet_wrap(~fishery_names, scales="free")
+  } else {
+      p <- p + facet_wrap(~fishery_names, scales="free", ncol=ncol)
+  }
   p <- p + xlab("Length (cm)") + ylab("Samples")
   p <- p + ggthemes::theme_few()
   # Tighten the axes
