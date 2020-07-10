@@ -174,7 +174,13 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
 
     ## Plot Stock recruitment relationship
     plot.srr(rep,show.legend=FALSE,save.dir=outdir,save.name="SRR")
-    ## status.table(rep)    
+    ## status.table(rep)
+
+    ## Plot temporal F
+    plot.F.temporal(rep,par,agg.years = TRUE,agg.regions=TRUE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="AnnualTempF")
+    plot.F.temporal(rep,par,agg.years = TRUE,agg.regions=FALSE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="AnnualRegionalTempF")
+    plot.F.temporal(rep,par,agg.years = FALSE,agg.regions=TRUE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="SeasonalTempF")
+    plot.F.temporal(rep,par,agg.years = FALSE,agg.regions=FALSE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="SeasonalRegionalTempF")
 
 
 
