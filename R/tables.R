@@ -40,7 +40,7 @@ likelihood.table <- function(likelihood.list, par.list,npars=FALSE){
     {
       npars <- unlist(lapply(par.list, n_pars))
       # Cannot assume order of the par list is the same as the likelihood list so safer to merge
-      max_grad_df <- data.frame(Model=names(max_grads), maxgrad = max_grads, npar = n_pars)
+      max_grad_df <- data.frame(Model=names(max_grads), maxgrad = max_grads, npar = npars)
       colnames(max_grad_df)[colnames(max_grad_df)=="maxgrad"] <- "Max Gradient"
       colnames(max_grad_df)[colnames(max_grad_df)=="npar"] <- "Parameters"
     } else {
