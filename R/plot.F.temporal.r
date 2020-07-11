@@ -127,7 +127,7 @@
 				print("You have supplied the par file so agg.ages will be ignored. Juvenile and adult F will be plotted instead.")
 			}
 
-			par.list <- check.rep.args(rep=par.list, rep.names=rep.names)
+			par.list <- check.par.args(par=par.list, par.names=rep.names)
     		par.names <- names(rep.list)
 
     					for(i in 1:length(dt.list))
