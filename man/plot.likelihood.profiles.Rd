@@ -4,10 +4,12 @@
 \alias{plot.likelihood.profiles}
 \title{Plot the likelihood profiles}
 \usage{
-plot.likelihood.profiles(llmodel, save.dir, save.name)
+plot.likelihood.profiles(llmodel, xrange = NULL, save.dir, save.name)
 }
 \arguments{
 \item{llmodel}{A data.frame of profile information for one model.}
+
+\item{xrange}{Minimum and maximum of xrange. Default is to be set automatically.}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 

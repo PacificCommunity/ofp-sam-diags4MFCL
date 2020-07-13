@@ -6,12 +6,13 @@
 #' The data generation is hidden away in other repos awaiting clean up.
 #' It's based on Rob and Matt's code.
 #' @param llmodel A data.frame of profile information for one model.
+#' @param xrange Minimum and maximum of xrange. Default is to be set automatically.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
-plot.likelihood.profiles <- function(llmodel, save.dir, save.name){
+plot.likelihood.profiles <- function(llmodel, xrange=NULL, save.dir, save.name){
   
   pdat <- as.data.table(llmodel)
   pdatm <- melt(pdat, id.vars = c("Model", "depletion"))
@@ -27,6 +28,9 @@ plot.likelihood.profiles <- function(llmodel, save.dir, save.name){
   p <- p + geom_line(aes(colour=Variable), size=2)
   p <- p + geom_vline(aes(xintercept=rep_dep), linetype=2)
   p <- p + xlab("SB/SBF=0") + ylab("Relative likelihood")
+  if(!is.null(xrange)){
+    p <- p + xlim(c(xrange[1], xrange[2]))
+  }
   p <- p + ggthemes::theme_few()
   
   save_plot(save.dir, save.name, plot=p)
