@@ -59,8 +59,14 @@ plot.movement.matrix = function(pars,par.names=NULL, age.vec=NULL, season.vec=NU
 		move.coef = merge(move.coef.1,move.coef.2,by=c("age","period","from","to")) %>% .[,diff:=value.x-value.y]
 
 		g = move.coef %>% data.table::setnames(.,c("age","period","from","to"),c("Age","Season","From","To")) %>%
-		ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_grid(Age~Season,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both)) +
-		ggplot2::ggtitle("Estimated regional movement (Model 1 - Model 2)") +
+		ggplot2::ggplot() + ggthemes::theme_few()
+		if(is.null(season.vec)){ # If just facetting by age, facets in columns not rows
+  		g <- g + ggplot2::facet_grid(Season~Age,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both))
+		}
+		if(!is.null(season.vec)){ # If facetting by season, seasons go in columns
+  		g <- g + ggplot2::facet_grid(Age~Season,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both))
+		}
+		g <- g + ggplot2::ggtitle("Estimated regional movement (Model 1 - Model 2)") +
 		ggplot2::geom_tile(ggplot2::aes(x=To,y=From,fill=diff)) +
 		ggplot2::scale_fill_gradient2("Diffusion difference",low = "#448aff",high = "#ff5252")
     } else if(length(pars)==1){
@@ -84,8 +90,14 @@ plot.movement.matrix = function(pars,par.names=NULL, age.vec=NULL, season.vec=NU
 		}
 
 		g = move.coef %>% data.table::setnames(.,c("age","period","from","to"),c("Age","Season","From","To")) %>%
-		ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_grid(Age~Season,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both)) +
-		ggplot2::ggtitle("Estimated regional movement") +
+		ggplot2::ggplot() + ggthemes::theme_few()
+		if(is.null(season.vec)){ # If just facetting by age, facets in columns not rows
+  		g <- g + ggplot2::facet_grid(Season~Age,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both))
+		}
+		if(!is.null(season.vec)){ # If facetting by season, seasons go in columns
+  		g <- g + ggplot2::facet_grid(Age~Season,labeller = ggplot2::labeller(Age = ggplot2::label_both, Season = ggplot2::label_both))
+		}
+		g <- g + ggplot2::ggtitle("Estimated regional movement") +
 		ggplot2::geom_tile(ggplot2::aes(x=To,y=From,fill=value)) +
 		ggplot2::scale_fill_gradientn("Diffusion",colors=c("royalblue3","deepskyblue1","gold","orange1","indianred1","firebrick2","#AC2020"))
     } else {
