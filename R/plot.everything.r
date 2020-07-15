@@ -43,9 +43,9 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
     if (file.exists(paste0(spp,'.frq'))){ #.frq
         frq=read.MFCLFrq(paste0(spp,'.frq'))
     } else {stop(paste0("Error: The rundir supplied does not contain a ",spp,".frq file. The rundir supplied was:\n",rundir,"\n"))}
-    if (file.exists(paste0(spp,'.ini'))){ #.ini
-        ini=read.MFCLIni(paste0(spp,'.ini'))
-    } else {stop(paste0("Error: The rundir supplied does not contain a ",spp,".ini file. The rundir supplied was:\n",rundir,"\n"))}
+    # if (file.exists(paste0(spp,'.ini'))){ #.ini
+    #     ini=read.MFCLIni(paste0(spp,'.ini'))
+    # } else {stop(paste0("Error: The rundir supplied does not contain a ",spp,".ini file. The rundir supplied was:\n",rundir,"\n"))}
     firstyear <- as.numeric(range(frq)["minyear"])
     Nfish <- n_fisheries(frq)
     binwd=lf_range(frq)["LFWidth"]
