@@ -41,9 +41,22 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
                 nRRpars=max(tag_fish_rep_grp(par))
                 maxRR=flagval(par,1,33)$value/100
                 ## Randomly draw reporting rates from uniform distribution for each possibly reporting rate
-                x=runif(nRRpars,0,maxRR)
-                matcher=match(tag_fish_rep_grp(par),1:nRRpars)
-                tag_fish_rep_rate(par) <- matrix(x[matcher],dim(tag_fish_rep_grp(par)))
+                if(length(which(tag_fish_rep_flags(par)==0))>0)
+                {
+                  orig.rep.rate = tag_fish_rep_rate(par)
+                  idx.fixed = which(tag_fish_rep_flags(par)==0)
+
+                  x=runif(nRRpars,0,maxRR)
+                  matcher=match(tag_fish_rep_grp(par),1:nRRpars)
+                  tag_fish_rep_rate(par) <- matrix(x[matcher],dim(tag_fish_rep_grp(par)))
+                  tag_fish_rep_rate(par)[idx.fixed] = orig.rep.rate[idx.fixed]
+
+                } else {
+                  x=runif(nRRpars,0,maxRR)
+                  matcher=match(tag_fish_rep_grp(par),1:nRRpars)
+                  tag_fish_rep_rate(par) <- matrix(x[matcher],dim(tag_fish_rep_grp(par)))
+                }
+
             }
 
             ## percent maturity
