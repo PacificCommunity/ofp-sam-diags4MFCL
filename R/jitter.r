@@ -123,7 +123,7 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
             if(sum(subset(flags(par),flagtype==-100000)$value>0) >0){
               # identify 'free' regions
               idx.free = which(subset(flags(par),flagtype==-100000)$value==1)
-              must.sum = sum(region_pars(par)[1,idx.free])
+              must.sum = 1-sum(region_pars(par)[1,-idx.free])
               rand.dist = c(rmultinom(1,500,region_pars(par)[1,idx.free]))
               rand.dist = (rand.dist/sum(rand.dist))*must.sum # normalize and make sum to orginial proportion
               region_pars(par)[1,idx.free] = rand.dist
