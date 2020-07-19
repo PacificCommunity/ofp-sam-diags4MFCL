@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.len.wt.temporal.r
 \name{plot.len.wt.temporal}
 \alias{plot.len.wt.temporal}
-\title{plot.len.wt.temporal}
+\title{Plot the temporal change in median length and weight of vulnerable numbers by fishery}
 \usage{
 plot.len.wt.temporal(
   par,
@@ -37,7 +37,4 @@ plot.len.wt.temporal(
 }
 \description{
 Plot the temporal change in median length and weight of vulnerable numbers by fishery
-}
-\details{
-More documentation needed...
 }

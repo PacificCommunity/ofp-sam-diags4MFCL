@@ -1,8 +1,6 @@
-#' plot.len.wt.temporal
-#' 
+
 #' Plot the temporal change in median length and weight of vulnerable numbers by fishery
 #'
-#' More documentation needed...
 #' @param par MFCLPar object
 #' @param rep MFCLRep object
 #' @param frq MFCLFrq object
