@@ -32,10 +32,13 @@ plot.comparisons = function(rep.list,frq.list,par.list,model.names,agg.years = T
 			if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
 			g1 = plot.depletion(rep.list,model.names,agg.years,agg.regions=FALSE,biomass.type=biomass.type,LRP=LRP,TRP=TRP,palette.func=palette.func,save.dir=save.dir,save.name=paste0("dep.reg-",save.name),...)
 			g2 = plot.biomass(rep.list,model.names,agg.years,agg.regions=FALSE,biomass.type,biomass.units,yaxis.free,palette.func,save.dir,save.name=paste0("bio.reg-",save.name),...)
+			g12 = 	plot.F.temporal(rep.list,par.list,model.names,agg.years,agg.regions=FALSE, yaxis.free = yaxis.free, palette.func=palette.func, save.dir=save.dir,save.name=paste0("tempF.reg-",save.name),...)
+
 			if(agg.regions)
 			{
 				g11 = plot.depletion(rep.list,model.names,agg.years,agg.regions=TRUE,biomass.type=biomass.type,LRP=LRP,TRP=TRP,palette.func=palette.func,save.dir=save.dir,save.name=paste0("dep-",save.name),...)
 				g22 = plot.biomass(rep.list,model.names,agg.years,agg.regions=TRUE,biomass.type,biomass.units,yaxis.free,palette.func,save.dir,save.name=paste0("bio-",save.name),...)
+				g13 = 	plot.F.temporal(rep.list,par.list,model.names,agg.years,agg.regions=TRUE, yaxis.free = yaxis.free, palette.func=palette.func, save.dir=save.dir,save.name=paste0("tempF-",save.name),...)
 			} 
 			
 			g3 = plot.selectivity(rep.list,model.names,sel.basis="AGE",palette.func,fisheries=1:max(sapply(rep.list,function(x)dimensions(x)["fisheries"])),save.dir,save.name=paste0("sel.age-",save.name),...)

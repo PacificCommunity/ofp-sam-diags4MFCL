@@ -41,9 +41,22 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
                 nRRpars=max(tag_fish_rep_grp(par))
                 maxRR=flagval(par,1,33)$value/100
                 ## Randomly draw reporting rates from uniform distribution for each possibly reporting rate
-                x=runif(nRRpars,0,maxRR)
-                matcher=match(tag_fish_rep_grp(par),1:nRRpars)
-                tag_fish_rep_rate(par) <- matrix(x[matcher],dim(tag_fish_rep_grp(par)))
+                if(length(which(tag_fish_rep_flags(par)==0))>0)
+                {
+                  orig.rep.rate = tag_fish_rep_rate(par)
+                  idx.fixed = which(tag_fish_rep_flags(par)==0)
+
+                  x=runif(nRRpars,0,maxRR)
+                  matcher=match(tag_fish_rep_grp(par),1:nRRpars)
+                  tag_fish_rep_rate(par) <- matrix(x[matcher],dim(tag_fish_rep_grp(par)))
+                  tag_fish_rep_rate(par)[idx.fixed] = orig.rep.rate[idx.fixed]
+
+                } else {
+                  x=runif(nRRpars,0,maxRR)
+                  matcher=match(tag_fish_rep_grp(par),1:nRRpars)
+                  tag_fish_rep_rate(par) <- matrix(x[matcher],dim(tag_fish_rep_grp(par)))
+                }
+
             }
 
             ## percent maturity
@@ -54,7 +67,7 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
 
             ## total population scaling parameter
             if (flagval(par,2,31)$value==1){  #If totpop is estimated
-              tot_pop(par) <- tot_pop(par)*rnorm(1,1,sd)
+              tot_pop(par) <- tot_pop(par)+rnorm(1,0,sd)
             }
 
             ## Recruitment deviates
@@ -75,7 +88,7 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
                 ##   if (flagval(par,-Selsfish[1],57)$value==2) stop("I don't know how many parameters are used by the double normal, so you will need to code this yourself")
                 ## ## Is selectivity cubic spline
                 ## if (flagval(par,-Selsfish[1],57)$value==3 & flagval(par,-Selsfish[1],61)$value>0) nsels=flagval(par,-Selsfish[1],61)$value
-                NewSel=c(aperm(fishery_sel(par)[,,Selsfish[1]],c(4,1,2,3,5,6)))*rnorm(nAge,1,sd)
+                NewSel=c(aperm(fishery_sel(par)[,,Selsfish[1]],c(4,1,2,3,5,6)))+rnorm(nAge,0,sd)
                 fishery_sel(par)[,,Selsfish] <- aperm(array(NewSel,c(nSeasons,nAgeYr,1,length(Selsfish),1,1)),c(2,3,4,1,5,6))
               }
             }
@@ -106,16 +119,26 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
               xdiff_coffs(par) <- xdiff_coffs(par)*rnorm(length(xdiff_coffs(par)),1,sd)
             }
 
+            ## regional recruitment distribution
+            if(sum(subset(flags(par),flagtype==-100000)$value>0) >0){
+              # identify 'free' regions
+              idx.free = which(subset(flags(par),flagtype==-100000)$value==1)
+              must.sum = 1-sum(region_pars(par)[1,-idx.free])
+              rand.dist = c(rmultinom(1,500,region_pars(par)[1,idx.free]))
+              rand.dist = (rand.dist/sum(rand.dist))*must.sum # normalize and make sum to orginial proportion
+              region_pars(par)[1,idx.free] = rand.dist
+            }
+
             ## regional recruitment variation
             if (flagval(par,2,71)$value==1){
-              region_rec_var(par) <- region_rec_var(par)*rnorm(length(region_rec_var(par)),1,sd)
+              region_rec_var(par)[] <- 0
             }
 
             ## Effort Devs
             if (flagval(par,2,34)$value==1){
               for (i in 1:nFish){
                 if (flagval(par,-i,4)$value>1){
-                  effort_dev_coffs(par)[[i]] <- effort_dev_coffs(par)[[i]]*rnorm(length(effort_dev_coffs(par)[[i]]),1,sd)
+                  effort_dev_coffs(par)[[i]] <- effort_dev_coffs(par)[[i]]+rnorm(length(effort_dev_coffs(par)[[i]]),0,sd)
                   effort_dev_coffs(par)[[i]][effort_dev_coffs(par)[[i]]>flagval(par,2,35)$value]=flagval(par,2,35)$value-(1e-4)
                   effort_dev_coffs(par)[[i]][effort_dev_coffs(par)[[i]]<  -flagval(par,2,35)$value]= -flagval(par,2,35)$value+(1e-4)
                 }
@@ -184,7 +207,7 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
 
             ## Richards
             if (flagval(par,1,227)$value==1){
-              richards(par) <- richards(par)*rnorm(1,1,sd)
+              richards(par) <- richards(par)+rnorm(1,0,sd)
             }
 
             ## Seasonal growth parameters
@@ -192,9 +215,15 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
             ## Variance parameters
             if (flagval(par,1,15)$value==1){
               growth_var_pars(par)[1]=growth_var_pars(par)[1]*rnorm(1,1,sd)
+              while(growth_var_pars(par)[1] <growth_var_pars(par)[1,2] | growth_var_pars(par)[1] > growth_var_pars(par)[1,3]) {
+                growth_var_pars(par)[1]=growth_var_pars(par)[1]*rnorm(1,1,sd)
+              }
             }
             if (flagval(par,1,16)$value==1){
               growth_var_pars(par)[2]=growth_var_pars(par)[2]*rnorm(1,1,sd)
+              while(growth_var_pars(par)[2] <growth_var_pars(par)[2,2] | growth_var_pars(par)[2] > growth_var_pars(par)[2,3]) {
+                growth_var_pars(par)[2]=growth_var_pars(par)[2]*rnorm(1,1,sd)
+              }
             }
 
             ## new orthogonal coefficients
@@ -204,7 +233,7 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
               for (i in 1:max(flagval(par,-1:-nFish,29)$value)){
                 matcher=which(flagval(par,-1:-nFish,29)$value==i)
                 if (flagval(par,-matcher[1],10)$value==1){
-                  catch_dev_coffs(par)[[i]]=catch_dev_coffs(par)[[i]]*rnorm(length(catch_dev_coffs(par)[[i]]),1,sd)
+                  catch_dev_coffs(par)[[i]]=catch_dev_coffs(par)[[i]]+rnorm(length(catch_dev_coffs(par)[[i]]),0,sd)
                 }
               }
             }
