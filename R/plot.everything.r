@@ -43,9 +43,9 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
     if (file.exists(paste0(spp,'.frq'))){ #.frq
         frq=read.MFCLFrq(paste0(spp,'.frq'))
     } else {stop(paste0("Error: The rundir supplied does not contain a ",spp,".frq file. The rundir supplied was:\n",rundir,"\n"))}
-    if (file.exists(paste0(spp,'.ini'))){ #.ini
-        ini=read.MFCLIni(paste0(spp,'.ini'))
-    } else {stop(paste0("Error: The rundir supplied does not contain a ",spp,".ini file. The rundir supplied was:\n",rundir,"\n"))}
+    # if (file.exists(paste0(spp,'.ini'))){ #.ini
+    #     ini=read.MFCLIni(paste0(spp,'.ini'))
+    # } else {stop(paste0("Error: The rundir supplied does not contain a ",spp,".ini file. The rundir supplied was:\n",rundir,"\n"))}
     firstyear <- as.numeric(range(frq)["minyear"])
     Nfish <- n_fisheries(frq)
     binwd=lf_range(frq)["LFWidth"]
@@ -174,7 +174,13 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
 
     ## Plot Stock recruitment relationship
     plot.srr(rep,show.legend=FALSE,save.dir=outdir,save.name="SRR")
-    ## status.table(rep)    
+    ## status.table(rep)
+
+    ## Plot temporal F
+    plot.F.temporal(rep,par,agg.years = TRUE,agg.regions=TRUE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="AnnualTempF")
+    plot.F.temporal(rep,par,agg.years = TRUE,agg.regions=FALSE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="AnnualRegionalTempF")
+    plot.F.temporal(rep,par,agg.years = FALSE,agg.regions=TRUE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="SeasonalTempF")
+    plot.F.temporal(rep,par,agg.years = FALSE,agg.regions=FALSE,agg.ages=NULL, yaxis.free = TRUE, save.dir=outdir,save.name="SeasonalRegionalTempF")
 
 
 
