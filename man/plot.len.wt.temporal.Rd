@@ -29,7 +29,7 @@ plot.len.wt.temporal(
 
 \item{fdescloc}{Optional: The path to the fdesc file to define the fishery names}
 
-\item{year.window}{Optional: A single value giving the temporal window used to calculate the change in median length and weight from the beginning to the end of the model period. Defaults to 25% of the model period.}
+\item{year.window}{Optional: A single value giving the temporal window used to calculate the change in median length and weight from the beginning to the end of the model period. Defaults to 25\% of the model period.}
 
 \item{save.dir}{Optional: Path to the directory where the outputs will be saved}
 

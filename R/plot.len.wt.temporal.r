@@ -7,7 +7,7 @@
 #' @param max.wt Optional: The maximum weight value to plot. Defaults to the maximum weight in the model
 #' @param max.len Optional: The maximum length value to plot. Defaults to the maximum length in the model
 #' @param fdescloc Optional: The path to the fdesc file to define the fishery names
-#' @param year.window Optional: A single value giving the temporal window used to calculate the change in median length and weight from the beginning to the end of the model period. Defaults to 25% of the model period.
+#' @param year.window Optional: A single value giving the temporal window used to calculate the change in median length and weight from the beginning to the end of the model period. Defaults to 25\% of the model period.
 #' @param save.dir Optional: Path to the directory where the outputs will be saved
 #' @param save.name Optional: Name stem for the output, useful when saving many model outputs in the same directory
 #' @export
