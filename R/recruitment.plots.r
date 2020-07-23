@@ -13,6 +13,7 @@
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param annual Boolean. Do you want to plot the annual or seasonal SRR. Default is FALSE
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
@@ -33,7 +34,7 @@
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 scale_fill_viridis_c
 #'
-plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, ...){
+plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, annual = FALSE, ...){
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)
@@ -58,6 +59,11 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   # Want data to have Model names in the original order - important for plotting order
   pdat$qname <- factor(pdat$qname, levels=names(rep.list))
   bhdat$qname <- factor(bhdat$qname, levels=names(rep.list))
+
+  if(annual)
+  {
+    pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=mean(rec,na.rm=TRUE)),by=.(year,qname)]
+  }
 
   if(length(rep.list)>1)
   {
@@ -91,6 +97,9 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
       p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
       p <- p + ggplot2::scale_fill_viridis_c("Year")
       p <- p + ggthemes::theme_few()
+      if (show.legend==FALSE){
+        p <- p + theme(legend.position="none")
+      }
   }
 
 	
