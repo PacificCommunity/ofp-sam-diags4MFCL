@@ -117,8 +117,8 @@ plot.len.wt.temporal = function(par,rep,frq,max.wt=NULL,max.len=NULL,fdescloc=NU
 				ggplot2::geom_line(ggplot2::aes(x=time,y=wt50),size=1) +
 				ggplot2::geom_segment(ggplot2::aes(x=time,y=obswt25,xend=time,yend=obswt75),col="red") +
 				ggplot2::geom_point(ggplot2::aes(x=time,y=obswt50),col="red") +
-				ggplot2::coord_cartesian(ylim=c(0,max.wt)) +
-				ggplot2::geom_text(data=wt.diff.dt,ggplot2::aes(x=time,y=ycoord,label=lab),hjust=0,vjust=1)
+				ggplot2::coord_cartesian(ylim=c(0,max.wt))# +
+				#ggplot2::geom_text(data=wt.diff.dt,ggplot2::aes(x=time,y=ycoord,label=lab),hjust=0,vjust=1)
 
 	# plot length
 		len.dt = cbind(fishery.dt,boot.mat[,1:3])
@@ -139,8 +139,8 @@ plot.len.wt.temporal = function(par,rep,frq,max.wt=NULL,max.len=NULL,fdescloc=NU
 				ggplot2::geom_line(ggplot2::aes(x=time,y=len50),size=1) +
 				ggplot2::geom_segment(ggplot2::aes(x=time,y=obslen25,xend=time,yend=obslen75),col="red") +
 				ggplot2::geom_point(ggplot2::aes(x=time,y=obslen50),col="red") +
-				ggplot2::coord_cartesian(ylim=c(0,max.len)) +
-				ggplot2::geom_text(data=len.diff.dt,ggplot2::aes(x=time,y=ycoord,label=lab),hjust=0,vjust=1)
+				ggplot2::coord_cartesian(ylim=c(0,max.len)) # +
+			#	ggplot2::geom_text(data=len.diff.dt,ggplot2::aes(x=time,y=ycoord,label=lab),hjust=0,vjust=1)
 
 		# write.out
 		if(!missing(save.dir))
