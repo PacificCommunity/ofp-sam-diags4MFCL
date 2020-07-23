@@ -68,7 +68,7 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
     ## Make the tag related plotting functions all at once
     if (file.exists(paste0(spp,'.tag'))) {
         tag=read.MFCLTag(paste0(spp,".tag"))
-        tagrep=read.temporary_tag_report("temporary_tag_report")
+        tagrep=read.temporary_tag_report("temporary_tag_report",year1=firstyear)
         fishmaptag=data.frame(fishery_name=labels$code,region=labels$region,gear=labels$method,fishery=1:Nfish)
         prepTag=tag.data.preparation(tagrep,tag,par,fishmaptag)
         plot.tag.attrition(prepTag,facet="none",plot.diff=TRUE,show.legend=FALSE,show.points=TRUE,save.dir=outdir,save.name="TagAllDiffScaled")
