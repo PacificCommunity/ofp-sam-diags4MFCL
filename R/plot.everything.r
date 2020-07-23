@@ -169,8 +169,8 @@ plot.everything <- function(rundir,spp='skj',parname=NULL,fdescloc=NULL,outdir=N
     fshtmp=which(!duplicated(flagval(par, -(1:Nfish), 24)$value))
     plot.selectivity(rep,sel.basis="AGE",fisheries=fshtmp,save.dir=outdir,save.name="SelectivityAgeGroups")
     plot.selectivity(rep,sel.basis="LENGTH",fisheries=fshtmp,save.dir=outdir,save.name="SelectivityLengthGroups")
-    plot.selectivity(rep,sel.basis="AGE",fisheries=1:Nfish,save.dir=outdir,save.name="SelectivityAge")
-    plot.selectivity(rep,sel.basis="LENGTH",fisheries=1:Nfish,save.dir=outdir,save.name="SelectivityLength")
+    plot.selectivity(rep,sel.basis="AGE",fisheries=1:Nfish,fsh.lab=labels,save.dir=outdir,save.name="SelectivityAge")
+    plot.selectivity(rep,sel.basis="LENGTH",fisheries=1:Nfish,fsh.lab=labels,save.dir=outdir,save.name="SelectivityLength")
 
     ## Plot Stock recruitment relationship
     plot.srr(rep,show.legend=FALSE,save.dir=outdir,save.name="SRR")

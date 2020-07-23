@@ -10,6 +10,7 @@ plot.selectivity(
   sel.basis = "AGE",
   palette.func = default.model.colours,
   fisheries,
+  fsh.lab,
   save.dir,
   save.name,
   ...
@@ -25,6 +26,8 @@ plot.selectivity(
 \item{palette.func}{A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().}
 
 \item{fisheries}{A vector giving the number of the fisheries to plot. Default is to plot everything.}
+
+\item{fsh.lab}{A vector of fisheries labels}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
 

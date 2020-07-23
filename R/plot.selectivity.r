@@ -7,6 +7,7 @@
 #' @param sel.basis A character string indicating if selectivity at age ('AGE') or length ('Length') should be plotted
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param fisheries A vector giving the number of the fisheries to plot. Default is to plot everything.
+#' @param fsh.lab A vector of fisheries labels
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
@@ -29,7 +30,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' 
 
-plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.func=default.model.colours,fisheries, save.dir,save.name, ...)
+plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.func=default.model.colours,fisheries,fsh.lab, save.dir,save.name, ...)
 {
 	  # Check and sanitise input MFCLRep arguments and names
     rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
@@ -73,6 +74,10 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 			{
 				plot.dt = plot.dt[fishery %in% fisheries]
 			}
+			if(!missing(fsh.lab))
+			{
+				fsh.lab = paste0("Fishery ",sort(unique(plot.dt$fishery)))
+			}
 			
 			
     # Want pdat to have Model names in the original order - important for plotting order
@@ -81,7 +86,7 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 		# make plot
 			# Get the colours - if all.model.names passed in using ... then it is passed to palette func
 			colour_values <- palette.func(selected.model.names = names(rep.list), ...)
-			g = plot.dt %>% 
+			g = plot.dt %>% .[,fishery:=factor(as.character(fishery),levels=as.character(sort(unique(plot.dt$fishery))),labels=fsh.lab)] %>%
 			ggplot2::ggplot() + ggthemes::theme_few() + ggplot2::facet_wrap(~fishery) +
 			ggplot2::xlab(xlab) + ggplot2::ylab("Selectivity") +
 			ggplot2::ggtitle("Estimated selectivity by fishery") +
