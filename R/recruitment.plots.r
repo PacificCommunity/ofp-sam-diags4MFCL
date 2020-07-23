@@ -19,6 +19,7 @@
 #' @import FLR4MFCL
 #' @import magrittr
 #' @importFrom data.table data.table
+#' @importFrom data.table as.data.table
 #' @importFrom data.table rbindlist
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 aes
@@ -62,7 +63,9 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
 
   if(annual)
   {
+    pdat = data.table::as.data.table(pdat)
     pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=mean(rec,na.rm=TRUE)),by=.(year,qname)]
+    pdat = as.data.frame(pdat)
   }
 
   if(length(rep.list)>1)
