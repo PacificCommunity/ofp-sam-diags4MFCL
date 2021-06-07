@@ -53,7 +53,7 @@
 				{
 					if(biomass.type == "SSB")
 					{
-						ylab = "Spawning Potential"
+						ylab = expression("SB"/"SB"["F=0"])
 
 						tmp.bio = data.table::as.data.table(adultBiomass(tmp.rep)) %>% .[,.(bio=mean(value)),by=.(year,area)] %>% .[,.(bio=sum(bio)),by=.(year)] %>%
 								  data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
@@ -62,7 +62,7 @@
 						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
 						rm(list=c("tmp.bio","tmp.bio_nf"))
 					} else if(biomass.type == "Total"){
-						ylab = "Total Biomass"
+						ylab = expression("B"/"B"["F=0"])
 						tmp.bio = data.table::as.data.table(totalBiomass(tmp.rep)) %>% .[,.(bio=mean(value)),by=.(year,area)] %>% .[,.(bio=sum(bio)),by=.(year)] %>%
 								  data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
 						tmp.bio_nf = data.table::as.data.table(totalBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)),by=.(year,area)] %>% .[,.(bio_nf=sum(bio_nf)),by=.(year)] %>%
