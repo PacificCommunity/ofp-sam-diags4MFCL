@@ -13,11 +13,13 @@
 #' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param annual Boolean. Do you want to plot the annual or seasonal SRR. Default is FALSE
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
 #' @import magrittr
 #' @importFrom data.table data.table
+#' @importFrom data.table as.data.table
 #' @importFrom data.table rbindlist
 #' @importFrom ggthemes theme_few
 #' @importFrom ggplot2 aes
@@ -31,8 +33,9 @@
 #' @importFrom ggplot2 scale_color_manual
 #' @importFrom ggplot2 geom_line
 #' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 scale_fill_viridis_c
 #'
-plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, ...){
+plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, annual = FALSE, ...){
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)
@@ -58,26 +61,50 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   pdat$qname <- factor(pdat$qname, levels=names(rep.list))
   bhdat$qname <- factor(bhdat$qname, levels=names(rep.list))
 
-	colour_values <- palette.func(selected.model.names = names(rep.list), ...)
-  # Plot everything
-  p <- ggplot2::ggplot(pdat, aes(x=sb, y=rec))
-  p <- p + ggplot2::geom_point(aes(group=qname, colour=qname, fill=qname))
-  p <- p + ggplot2::ylim(c(0,NA))
-  p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb, y=rec, colour=qname), size=1.2)
-  p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
-	p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
-	p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
-	p <- p + ggthemes::theme_few()
-  if (show.legend==FALSE){
-    p <- p + theme(legend.position="none")
+  if(annual)
+  {
+    pdat = data.table::as.data.table(pdat)
+    pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=mean(rec,na.rm=TRUE)),by=.(year,qname)]
+    pdat = as.data.frame(pdat)
   }
 
-	# Crappy hack to make the black points plot last because geom_point is not ordering by factor
-	if("black" %in% colour_values){
-	  black_model <- names(which(colour_values=="black"))
-	  black_dat <- subset(pdat, qname==black_model)
-    p <- p + ggplot2::geom_point(data=black_dat, aes(x=sb, y=rec), colour="black")
-	}
+  if(length(rep.list)>1)
+  {
+      colour_values <- palette.func(selected.model.names = names(rep.list), ...)
+      # Plot everything
+      p <- ggplot2::ggplot(pdat, aes(x=sb, y=rec))
+      p <- p + ggplot2::geom_point(aes(group=qname, colour=qname, fill=qname))
+      p <- p + ggplot2::ylim(c(0,NA))
+      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb, y=rec, colour=qname), size=1.2)
+      p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
+      p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
+      p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
+      p <- p + ggthemes::theme_few()
+      if (show.legend==FALSE){
+        p <- p + theme(legend.position="none")
+      }
+
+      # Crappy hack to make the black points plot last because geom_point is not ordering by factor
+      if("black" %in% colour_values){
+        black_model <- names(which(colour_values=="black"))
+        black_dat <- subset(pdat, qname==black_model)
+        p <- p + ggplot2::geom_point(data=black_dat, aes(x=sb, y=rec), colour="black")
+      }
+  } else {
+          colour_values <- palette.func(selected.model.names = names(rep.list), ...)
+      # Plot everything
+      p <- ggplot2::ggplot(pdat, aes(x=sb, y=rec))
+      p <- p + ggplot2::geom_point(aes(fill=year),shape=21,color="black",size=2)
+      p <- p + ggplot2::ylim(c(0,NA))
+      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb, y=rec),color="black", size=1.2)
+      p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
+      p <- p + ggplot2::scale_fill_viridis_c("Year")
+      p <- p + ggthemes::theme_few()
+      if (show.legend==FALSE){
+        p <- p + theme(legend.position="none")
+      }
+  }
+
 	
 
   save_plot(save.dir, save.name, plot=p)

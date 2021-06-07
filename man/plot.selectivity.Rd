@@ -12,6 +12,7 @@ plot.selectivity(
   fisheries,
   save.dir,
   save.name,
+  fsh.lab = NULL,
   ...
 )
 }
@@ -29,6 +30,8 @@ plot.selectivity(
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
+
+\item{fsh.lab}{A vector of fisheries labels}
 
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
 }
