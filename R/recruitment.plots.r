@@ -54,7 +54,7 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   sb <- seq(0, max_sb, length=100)
   # Extract the BH params and make data.frame of predicted recruitment
   params <- lapply(rep.list, function(x) c(srr(x)[c("a","b")]))
-  bhdat <- data.frame(rec = unlist(lapply(params, function(x) (sb * x[1]/4) / (x[2]+sb))), sb=sb, qname = rep(rep.names, each=length(sb)))
+  bhdat <- data.frame(rec = unlist(lapply(params, function(x) (sb * x[1]) / (x[2]+sb))), sb=sb, qname = rep(rep.names, each=length(sb)))
 
   
   # Want data to have Model names in the original order - important for plotting order
@@ -72,11 +72,11 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   {
       colour_values <- palette.func(selected.model.names = names(rep.list), ...)
       # Plot everything
-      p <- ggplot2::ggplot(pdat, aes(x=sb, y=rec))
+      p <- ggplot2::ggplot(pdat, aes(x=sb/1000, y=rec/1000000))
       p <- p + ggplot2::geom_point(aes(group=qname, colour=qname, fill=qname))
       p <- p + ggplot2::ylim(c(0,NA))
-      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb, y=rec, colour=qname), size=1.2)
-      p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
+      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/1000, y=rec/1000000, colour=qname), size=1.2)
+      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (N; millions)")
       p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
       p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
       p <- p + ggthemes::theme_few()
@@ -93,11 +93,11 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   } else {
           colour_values <- palette.func(selected.model.names = names(rep.list), ...)
       # Plot everything
-      p <- ggplot2::ggplot(pdat, aes(x=sb, y=rec))
+      p <- ggplot2::ggplot(pdat, aes(x=sb/1000, y=rec/1000000))
       p <- p + ggplot2::geom_point(aes(fill=year),shape=21,color="black",size=2)
       p <- p + ggplot2::ylim(c(0,NA))
-      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb, y=rec),color="black", size=1.2)
-      p <- p + ggplot2::xlab("Adult biomass") + ggplot2::ylab("Recruitment")
+      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/1000, y=rec/1000000),color="black", size=1.2)
+      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (N; millions)")
       p <- p + ggplot2::scale_fill_viridis_c("Year")
       p <- p + ggthemes::theme_few()
       if (show.legend==FALSE){
