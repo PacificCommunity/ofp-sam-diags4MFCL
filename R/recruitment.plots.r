@@ -14,6 +14,8 @@
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param annual Boolean. Do you want to plot the annual or seasonal SRR. Default is FALSE
+#' @param sb.units Divisor for rescaling the biomass units. Default is 1000
+#' @param rec.units Divisor for rescaling the recruitment units. Default is 1000000
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
@@ -35,7 +37,7 @@
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 scale_fill_viridis_c
 #'
-plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, annual = FALSE, ...){
+plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=default.model.colours, save.dir, save.name, annual = FALSE, sb.units=1000,rec.units=1000000,...){
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)
@@ -72,11 +74,11 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   {
       colour_values <- palette.func(selected.model.names = names(rep.list), ...)
       # Plot everything
-      p <- ggplot2::ggplot(pdat, aes(x=sb/1000, y=rec/1000000))
+      p <- ggplot2::ggplot(pdat, aes(x=sb/sb.units, y=rec/rec.units))
       p <- p + ggplot2::geom_point(aes(group=qname, colour=qname, fill=qname))
       p <- p + ggplot2::ylim(c(0,NA))
-      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/1000, y=rec/1000000, colour=qname), size=1.2)
-      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (N; millions)")
+      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/sb.units, y=rec/rec.units, colour=qname), size=1.2)
+      p <- p + ggplot2::xlab(paste0("Adult biomass (mt; ",format(sb.units,big.mark=",", trim=TRUE,scientific=FALSE),"s)")) + ggplot2::ylab(paste0("Recruitment (N; ",format(rec.units,big.mark=",", trim=TRUE,scientific=FALSE),"s)"))
       p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
       p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
       p <- p + ggthemes::theme_few()
@@ -88,16 +90,16 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
       if("black" %in% colour_values){
         black_model <- names(which(colour_values=="black"))
         black_dat <- subset(pdat, qname==black_model)
-        p <- p + ggplot2::geom_point(data=black_dat, aes(x=sb, y=rec), colour="black")
+        p <- p + ggplot2::geom_point(data=black_dat, aes(x=sb/sb.units, y=rec/rec.units), colour="black")
       }
   } else {
           colour_values <- palette.func(selected.model.names = names(rep.list), ...)
       # Plot everything
-      p <- ggplot2::ggplot(pdat, aes(x=sb/1000, y=rec/1000000))
+      p <- ggplot2::ggplot(pdat, aes(x=sb/sb.units, y=rec/rec.units))
       p <- p + ggplot2::geom_point(aes(fill=year),shape=21,color="black",size=2)
       p <- p + ggplot2::ylim(c(0,NA))
-      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/1000, y=rec/1000000),color="black", size=1.2)
-      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (N; millions)")
+      p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/sb.units, y=rec/rec.units),color="black", size=1.2)
+      p <- p + ggplot2::xlab(paste0("Adult biomass (mt; ",format(sb.units,big.mark=",", trim=TRUE,scientific=FALSE),"s)")) + ggplot2::ylab(paste0("Recruitment (N; ",format(rec.units,big.mark=",", trim=TRUE,scientific=FALSE),"s)"))
       p <- p + ggplot2::scale_fill_viridis_c("Year")
       p <- p + ggthemes::theme_few()
       if (show.legend==FALSE){
