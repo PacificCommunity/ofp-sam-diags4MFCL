@@ -76,7 +76,7 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
       p <- p + ggplot2::geom_point(aes(group=qname, colour=qname, fill=qname))
       p <- p + ggplot2::ylim(c(0,NA))
       p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/1000, y=rec/1000000, colour=qname), size=1.2)
-      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (n; millions)")
+      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (N; millions)")
       p <- p + ggplot2::scale_color_manual("Model",values=colour_values)
       p <- p + ggplot2::scale_fill_manual("Model",values=colour_values)
       p <- p + ggthemes::theme_few()
@@ -97,7 +97,7 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
       p <- p + ggplot2::geom_point(aes(fill=year),shape=21,color="black",size=2)
       p <- p + ggplot2::ylim(c(0,NA))
       p <- p + ggplot2::geom_line(data=bhdat, aes(x=sb/1000, y=rec/1000000),color="black", size=1.2)
-      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (n; millions)")
+      p <- p + ggplot2::xlab("Adult biomass (mt; 1,000s)") + ggplot2::ylab("Recruitment (N; millions)")
       p <- p + ggplot2::scale_fill_viridis_c("Year")
       p <- p + ggthemes::theme_few()
       if (show.legend==FALSE){
