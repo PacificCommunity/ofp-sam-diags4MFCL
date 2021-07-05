@@ -11,6 +11,9 @@ plot.srr(
   palette.func = default.model.colours,
   save.dir,
   save.name,
+  annual = FALSE,
+  sb.units = 1000,
+  rec.units = 1e+06,
   ...
 )
 }
@@ -26,6 +29,12 @@ plot.srr(
 \item{save.dir}{Path to the directory where the outputs will be saved}
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
+
+\item{annual}{Boolean. Do you want to plot the annual or seasonal SRR. Default is FALSE}
+
+\item{sb.units}{Divisor for rescaling the biomass units. Default is 1000}
+
+\item{rec.units}{Divisor for rescaling the recruitment units. Default is 1000000}
 
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
 }

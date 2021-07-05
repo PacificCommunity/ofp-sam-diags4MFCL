@@ -37,6 +37,8 @@ plot.maturity(
 
 \item{ylab}{Name to display on the y axis label}
 
+\item{LegLoc}{legend location if show.legen is TRUE}
+
 \item{linesize}{Size of line.}
 
 \item{save.dir}{Path to the directory where the outputs will be saved}
@@ -44,8 +46,6 @@ plot.maturity(
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
 
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
-
-\item{LegLon}{legend location if show.legen is TRUE}
 }
 \description{
 Plots the natural mortality by length bin or age class for each mode

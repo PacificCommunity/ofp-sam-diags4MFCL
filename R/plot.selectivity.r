@@ -10,6 +10,7 @@
 #' @param fishery_names The names of the fisheries to plot. If not supplied, the fishery numbers from the fisheries argument is used.
 #' @param save.dir Path to the directory where the outputs will be saved
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
+#' @param fsh.lab A vector of fisheries labels
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #' @export
 #' @import FLR4MFCL
@@ -74,6 +75,10 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 			{
 				plot.dt = plot.dt[fishery %in% fisheries]
 			}
+			if(is.null(fsh.lab))
+			{
+				fsh.lab = paste0("Fishery ",sort(unique(plot.dt$fishery)))
+			}
 			
     # Want pdat to have Model names in the original order - important for plotting order
     plot.dt[,Model:=factor(model, levels=names(rep.list))]
@@ -100,7 +105,7 @@ plot.selectivity = function(rep.list,rep.names=NULL,sel.basis="AGE", palette.fun
 				stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
 			} else {
 				if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
+				ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 			}
 		} 
 			

@@ -9,14 +9,13 @@
 #' It should also work with the weight.fit file but hasn't yet been tested.
 #' Does not handle multispecies.
 #' @param filname The filename of the length.fit file, including the location.
-#' @export
+#' @export length.fit.preparation
+#' @rdname length.fit.preparation 
+#' @name length.fit.preparation
 #' @import FLR4MFCL
-
 length.fit.preparation <- function(filename){
-  
   # Read the whole dang thing - it's pretty huge
   dat <-readLines(filename)
-  
   # This whole first section is sort of metadata stuff
   # Pulling out length vectors, number of fisheries etc
   # Get the version number - needed because older versions have different spacing

@@ -54,20 +54,21 @@
 					if(biomass.type == "SSB")
 					{
 						ylab = expression("SB"/"SB"["F=0"])
-						tmp.bio.array = adultBiomass(tmp.rep)@.Data[1,,1,,,1]
-						tmp.bio = apply(tmp.bio.array,1,function(x)sum(colMeans(x)))/1000
-						tmp.bio_nf.array = adultBiomass_nofish(tmp.rep)@.Data[1,,1,,,1]
-						tmp.bio_nf = apply(tmp.bio_nf.array,1,function(x)sum(colMeans(x)))/1000
-						dt.list[[i]] = data.table::data.table(time=as.numeric(names(tmp.bio)),bio=tmp.bio,bio_nf=tmp.bio_nf,dep=tmp.bio/tmp.bio_nf,model=rep(tmp.name,length(tmp.bio)),region=rep("All regions",length(tmp.bio)))
-						rm(list=c("tmp.bio","tmp.bio.array","tmp.bio_nf","tmp.bio_nf.array"))
+
+						tmp.bio = data.table::as.data.table(adultBiomass(tmp.rep)) %>% .[,.(bio=mean(value)),by=.(year,area)] %>% .[,.(bio=sum(bio)),by=.(year)] %>%
+								  data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
+						tmp.bio_nf = data.table::as.data.table(adultBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)),by=.(year,area)] %>% .[,.(bio_nf=sum(bio_nf)),by=.(year)] %>%
+								  data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+						rm(list=c("tmp.bio","tmp.bio_nf"))
 					} else if(biomass.type == "Total"){
 						ylab = expression("B"/"B"["F=0"])
-						tmp.bio.array = totalBiomass(tmp.rep)@.Data[1,,1,,,1]
-						tmp.bio = apply(tmp.bio.array,1,function(x)sum(colMeans(x)))/1000
-						tmp.bio_nf.array = totalBiomass_nofish(tmp.rep)@.Data[1,,1,,,1]
-						tmp.bio_nf = apply(tmp.bio_nf.array,1,function(x)sum(colMeans(x)))/1000
-						dt.list[[i]] = data.table::data.table(time=as.numeric(names(tmp.bio)),bio=tmp.bio,bio_nf=tmp.bio_nf,dep=tmp.bio/tmp.bio_nf,model=rep(tmp.name,length(tmp.bio)),region=rep("All regions",length(tmp.bio)))
-						rm(list=c("tmp.bio","tmp.bio.array","tmp.bio_nf","tmp.bio_nf.array"))
+						tmp.bio = data.table::as.data.table(totalBiomass(tmp.rep)) %>% .[,.(bio=mean(value)),by=.(year,area)] %>% .[,.(bio=sum(bio)),by=.(year)] %>%
+								  data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
+						tmp.bio_nf = data.table::as.data.table(totalBiomass_nofish(tmp.rep)) %>% .[,.(bio_nf=mean(value)),by=.(year,area)] %>% .[,.(bio_nf=sum(bio_nf)),by=.(year)] %>%
+								  data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
+						dt.list[[i]] = merge(tmp.bio,tmp.bio_nf) %>% .[,dep:=bio/bio_nf] %>% .[,.(time,bio,bio_nf,dep,model,region)]  %>% .[,time:=as.numeric(time)]
+						rm(list=c("tmp.bio","tmp.bio_nf"))
 					} else {
 						stop("Invalid biomass.type. Please use either 'SSB' or 'Total'")
 					}
@@ -186,7 +187,7 @@
 				stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
 			} else {
 				if (! dir.exists(save.dir))dir.create(save.dir,recursive=TRUE)
-				ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 9, height = 9, units = c("in"))
+				ggplot2::ggsave(paste0(save.name,".png"),plot=g, device = "png", path = save.dir,scale = 1, width = 16, height = 9, units = c("in"))
 			}
 		} 
 			
