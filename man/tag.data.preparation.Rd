@@ -13,7 +13,7 @@ tag.data.preparation(tagrep, tagobs, par, fishery.map)
 
 \item{par}{An object of MFCLPar that contains the effort deviations.}
 
-\item{fishery.map}{A data.frame that describes which fishery is fishing in which region and with which gear. The columns are: fishery_name, region, gear, fishery (the reference number)and optionally tag_recapture_name, if not provided will default to the gear and region. The map should contain entries for all fisheries to avoid data being inadvertently dropped.}
+\item{fishery.map}{A data.frame that describes which fishery is fishing in which region and with which gear. The columns are: fishery_name, region, gear, fishery (the reference number), tag_recapture_group and tag_recapture_name. The map should contain entries for all fisheries to avoid data being inadvertently dropped.}
 }
 \description{
 The data required for the tagging plots are in different sources (temporary_tag_report, tag files, par files).

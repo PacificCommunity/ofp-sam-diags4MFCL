@@ -117,6 +117,17 @@ check.frqreal.args <- function(frqreal, frqreal.names=NULL){
   return(out)
 }
 
+check.tagrelease.args <- function(tagrelease, names=NULL){
+  out <- check.list.args(obj=tagrelease, obj.names = names, type="data.frame")
+  return(out)
+}
+
+check.tagrep.args <- function(tagrep, names=NULL){
+  out <- check.list.args(obj=tagrep, obj.names = names, type="data.frame")
+  return(out)
+}
+
+
 
 
 
