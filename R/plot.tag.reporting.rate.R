@@ -1,4 +1,4 @@
-#' Plot tag reporting rates
+#' Plot tag reporting rate
 #' 
 #' The tag reporting rates are reported by group. A fishery may belong to multiple groups, depending on the tag release event.
 #' Plots a box or violing plot of the reporting rates for chosen reporting rate groups for all models in the input the list.
