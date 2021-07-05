@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.tag.reporting.rate.R
 \name{plot.tag.reporting.rate}
 \alias{plot.tag.reporting.rate}
-\title{Plot tag reporting rates}
+\title{Plot tag reporting rate}
 \usage{
 plot.tag.reporting.rate(
   par.list,

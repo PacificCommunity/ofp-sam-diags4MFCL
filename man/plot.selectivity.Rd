@@ -13,7 +13,6 @@ plot.selectivity(
   fishery.names = as.character(fisheries),
   save.dir,
   save.name,
-  fsh.lab = NULL,
   ...
 )
 }
@@ -32,11 +31,11 @@ plot.selectivity(
 
 \item{save.name}{Name stem for the output, useful when saving many model outputs in the same directory}
 
-\item{fsh.lab}{A vector of fisheries labels}
-
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
 
 \item{fishery_names}{The names of the fisheries to plot. If not supplied, the fishery numbers from the fisheries argument is used.}
+
+\item{fsh.lab}{A vector of fisheries labels}
 }
 \description{
 Compare the estimated selectivity across different models.
