@@ -20,7 +20,7 @@
 #' @importFrom ggplot2 ggtitle
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom ggplot2 ggsave
-#' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 geom_path
 #' @importFrom ggplot2 geom_point
 #' @importFrom ggplot2 geom_polygon
 #' @importFrom ggplot2 scale_fill_gradient
@@ -71,7 +71,7 @@
 			ggplot2::geom_hline(yintercept=1,color="black",size=1.5) +
 			ggplot2::geom_vline(xintercept=0.2,size=1.5) +
 			ggplot2::ggtitle(paste0("Majuro (time-dynamic): ",rep.name)) +
-			ggplot2::geom_line(ggplot2::aes(x=dep,y=f_fmsy),size=0.75) +
+			ggplot2::geom_path(ggplot2::aes(x=dep,y=f_fmsy),size=0.75) +
 			ggplot2::geom_point(ggplot2::aes(x=dep,y=f_fmsy,fill=time),size=5,shape=21, stroke=0) +
 			ggplot2::geom_point(data=data.frame(dep=tail(plot.dt$dep,n=1),f_fmsy=tail(plot.dt$f_fmsy,n=1)),ggplot2::aes(x=dep,y=f_fmsy),fill="#42a5f5",size=5,shape=21, stroke=0) +
 			ggplot2::geom_point(data=data.frame(dep=head(plot.dt$dep,n=1),f_fmsy=head(plot.dt$f_fmsy,n=1)),ggplot2::aes(x=dep,y=f_fmsy),fill="#66bb6a",size=5,shape=21, stroke=0) +
