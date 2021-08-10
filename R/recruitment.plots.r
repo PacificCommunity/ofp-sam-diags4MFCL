@@ -63,10 +63,11 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   pdat$qname <- factor(pdat$qname, levels=names(rep.list))
   bhdat$qname <- factor(bhdat$qname, levels=names(rep.list))
 
+  # If 1 182 1 SRR relationship gives annual recruitment based on mean SB
   if(annual)
   {
     pdat = data.table::as.data.table(pdat)
-    pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=mean(rec,na.rm=TRUE)),by=.(year,qname)]
+    pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=sum(rec,na.rm=TRUE)),by=.(year,qname)]
     pdat = as.data.frame(pdat)
   }
 
@@ -135,7 +136,7 @@ plot.rec.dist <- function(rep.list, rep.names=NULL, year_range = (as.numeric(ran
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)
-
+  
   if (length(rep.list) == 1) {
     dat <- as.data.frame(popN(rep.list[[1]])[1,ac(year_range)])
     dat$total_rec <- c(areaSums(seasonSums(popN(rep.list[[1]])[1,ac(year_range)])))
@@ -151,12 +152,23 @@ plot.rec.dist <- function(rep.list, rep.names=NULL, year_range = (as.numeric(ran
     )
     dat <- do.call("rbind", dat)
   }
+  
+  #grep("R2", rep.names)
 
   # Tidy up data
   dat$model <- rep(rep.names, each=dim(dat)[1] / length(rep.names))
   no_seasons <- length(unique(dat$season))
   no_areas <- length(unique(dat$area))
   dat$area_name <- paste("Region ", dat$area, sep="")
+  #dat$group <- rep(group, each = dim(dat)[1] / length(group))
+  
+  # Pass in group vector - same length as number of reps, determines which group the model is in
+  # So for SPA the grouping is by R factor. Vector of length 24, where model R1 is group 1, R2 is 
+  # group 2
+  # If no group vector, vector is all ones
+  # violin or box plot, x = season, fill = group
+  # Add group column to dat and then plot
+  group <- 
 
   # And plot
   # Colour by area - not sure it's a great idea

@@ -89,7 +89,7 @@ plot.effort.dev.penalties <- function(frqreal, par, fishery_map, fisheries = uni
   pdat <- subset(pdat, fishery %in% fisheries)
   # Plot away
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=effpen))
-  p <- p + ggplot2::geom_line(aes(colour=gear), na.rm=TRUE)
+  p <- p + ggplot2::geom_line(aes(group = fishery, colour=gear), na.rm=TRUE)
   p <- p + ggplot2::facet_wrap(~region, scales="free")
   p <- p + ggplot2::labs(colour = "Fishery")
   p <- p + ggplot2::xlab("Time") + ggplot2::ylab("Effort deviation penalty")

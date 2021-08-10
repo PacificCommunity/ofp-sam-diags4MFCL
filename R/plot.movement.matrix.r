@@ -27,6 +27,7 @@
 plot.movement.matrix = function(pars,par.names=NULL, age.vec=NULL, season.vec=NULL, save.dir,save.name)
 {
 	pars = check.par.args(par=pars, par.names=par.names)
+	
     par.names = names(pars)
     if(length(pars)>2)
     {
@@ -34,6 +35,11 @@ plot.movement.matrix = function(pars,par.names=NULL, age.vec=NULL, season.vec=NU
     } else if(length(pars)==2){
     	 move.coef.1 = data.table::as.data.table(diff_coffs_age_period(pars[[1]]))
     	 move.coef.2 = data.table::as.data.table(diff_coffs_age_period(pars[[2]]))
+    	 # Careful as FLR4MFCL 1.3.2 and probably other versions have mislabeled from and to
+    	 # From should sum to 1 (by from, age, period)
+    	 setnames(move.coef.1, old = c("from", "to"), new = c("to", "from"))
+    	 setnames(move.coef.2, old = c("from", "to"), new = c("to", "from"))
+    	 
 
 		if(is.null(age.vec))
 		{
@@ -71,6 +77,9 @@ plot.movement.matrix = function(pars,par.names=NULL, age.vec=NULL, season.vec=NU
 		ggplot2::scale_fill_gradient2("Diffusion difference",low = "#448aff",high = "#ff5252")
     } else if(length(pars)==1){
     	move.coef = data.table::as.data.table(diff_coffs_age_period(pars[[1]]))
+    	 # Careful as FLR4MFCL 1.3.2 and probably other versions have mislabeled from and to
+    	 # From should sum to 1 (by from, age, period)
+    	 setnames(move.coef, old = c("from", "to"), new = c("to", "from"))
 
 		if(is.null(age.vec))
 		{

@@ -57,6 +57,7 @@ plot.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, names=NULL, f
 #' @rdname plot.tag.returns.time.v2
 #' @name Plot tag returns time
 prepare.tag.returns.time.v2 <- function(tagrelease.list, tagrep.list, names=NULL, fishery.map, plot.diff=TRUE, scale.diff=TRUE, show.legend=TRUE, show.points=FALSE, palette.func=default.model.colours, save.dir, save.name, ...){
+  
   tagrelease.list <- check.tagrelease.args(tagrelease.list, names) 
   tagrep.list <- check.tagrep.args(tagrep.list, names) 
   

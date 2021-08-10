@@ -108,7 +108,6 @@ plot.effort.devs <- function(frqreal.list, par.list, model.names=NULL, fisheries
   
   # Want pdat to have Model names in the original order - important for plotting order
   pdat[,Model:=factor(Model, levels=names(frqreal.list))]
-  
   colour_values <- palette.func(selected.model.names = names(frqreal.list), ...)
   p <- ggplot2::ggplot(pdat, ggplot2::aes(x=ts, y=edev))
   if(show.points==TRUE){
