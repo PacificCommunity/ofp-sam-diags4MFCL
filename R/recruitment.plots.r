@@ -66,7 +66,7 @@ plot.srr <- function(rep.list, rep.names=NULL, show.legend=TRUE, palette.func=de
   if(annual)
   {
     pdat = data.table::as.data.table(pdat)
-    pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=mean(rec,na.rm=TRUE)),by=.(year,qname)]
+    pdat = pdat[,.(sb=mean(sb,na.rm=TRUE),rec=sum(rec,na.rm=TRUE)),by=.(year,qname)]
     pdat = as.data.frame(pdat)
   }
 
