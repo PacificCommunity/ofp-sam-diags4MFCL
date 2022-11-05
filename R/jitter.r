@@ -161,7 +161,7 @@ setMethod("jitter", signature(par='MFCLPar',sd='numeric',seed='numeric'),functio
 
                 for (i in 1:nVars){
                     matcher=flagval(par,-1:-nFish,44)$value==i
-                    if (all(flagval(par,-1:-nfish,43)$value[matcher]==1)){
+                    if (all(flagval(par,-1:-nFish,43)$value[matcher]==1)){
                         fish_params(par)[4,matcher]=fish_params(par)[4,matcher]*rnorm(1,1,sd)
                     }
                 }
