@@ -22,8 +22,10 @@
 #'
 #' @return An object of class MFCLPar
 #'
+#' @importFrom methods setGeneric setMethod
 #'
 #' @export
+#'
 #' @docType methods
 #' @rdname par-methods
 setGeneric('jitter',function(par,sd,seed) standardGeneric('jitter'))
