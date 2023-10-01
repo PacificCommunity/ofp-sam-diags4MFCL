@@ -8,7 +8,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "nicholasd@spc.int")
 Description: R package that pairs with FLR4MFCL to present results and diagnostics of OFP SAM stock assessment and MSE models using MFCL.
-License: GPL-3 + file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.2.3
