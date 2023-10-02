@@ -26,8 +26,8 @@
 #' @param save.name Name stem for the output, useful when saving many model
 #'        outputs in the same directory.
 #' @param \dots Extra arguments passed to \code{palette.func}. Use the argument
-#'        all.model.colours to ensure consistency of model colours when plotting
-#'        a subset of models.
+#'        \code{all.model.colours} to ensure consistency of model colours when
+#'        plotting a subset of models.
 #'
 #' @importFrom FLR4MFCL dimensions fm m_at_age mat popN
 #' @import magrittr
@@ -68,37 +68,37 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
         mlab <- "Annual"
         if(agg.regions)
         {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,dead:=f*N] %>%
             .[age %in% agg.ages,.(dead=sum(dead),N=sum(N)),by=.(year,season)] %>% .[,F:=(dead/N)] %>% .[,.(F=mean(F)*4),by=year] %>%
-            data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
+            setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
         } else {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,dead:=f*N] %>%
             .[age %in% agg.ages,.(dead=sum(dead),N=sum(N)),by=.(year,season,area)] %>% .[,F:=(dead/N)] %>% .[,.(F=mean(F)*4),by=.(year,area)] %>%
-            data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
+            setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
         }
       } else {
         mlab <- "Seasonal"
         if(agg.regions)
         {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,dead:=f*N] %>%
             .[age %in% agg.ages,.(dead=sum(dead),N=sum(N)),by=.(year,season)] %>% .[,F:=(dead/N)] %>%
             .[,model:=tmp.name] %>% .[,region:="All regions"] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
         } else {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,dead:=f*N] %>%
             .[age %in% agg.ages,.(dead=sum(dead),N=sum(N)),by=.(year,season,area)] %>% .[,F:=(dead/N)] %>%
-            data.table::setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+            setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
         }
       }
 
@@ -107,23 +107,23 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
     }
 
     # combine into single data.table
-    plot.dt <- data.table::rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
+    plot.dt <- rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
 
     # make plot
     # Get the colours - if all.model.names passed in using ... then it is passed to palette func
     colour_values <- palette.func(selected.model.names=names(x), ...)
     g <- plot.dt %>%
-      ggplot2::ggplot() + ggthemes::theme_few() +
-      ggplot2::geom_hline(yintercept=0) +
-      ggplot2::xlab("Year") + ggplot2::ylab("Fishing mortality") +
-      ggplot2::ggtitle(paste0(mlab, " average F, age classes: ", paste0(range(agg.ages), collapse="-"))) +
-      ggplot2::geom_line(ggplot2::aes(x=time, y=F, color=model), size=1) +
-      ggplot2::scale_color_manual("Model", values=colour_values)
+      ggplot() + theme_few() +
+      geom_hline(yintercept=0) +
+      xlab("Year") + ylab("Fishing mortality") +
+      ggtitle(paste0(mlab, " average F, age classes: ", paste0(range(agg.ages), collapse="-"))) +
+      geom_line(aes(x=time, y=F, color=model), size=1) +
+      scale_color_manual("Model", values=colour_values)
     if(yaxis.free)
     {
-      g <- g + ggplot2::facet_wrap(~region, scales="free_y")
+      g <- g + facet_wrap(~region, scales="free_y")
     } else {
-      g <- g + ggplot2::facet_wrap(~region)
+      g <- g + facet_wrap(~region)
     }
   } else {
     if(!is.null(agg.ages))
@@ -150,41 +150,41 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
         mlab <- "Annual"
         if(agg.regions)
         {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,juv:=prop.juv[age]*N] %>% .[,adult:=prop.adult[age]*N] %>% .[,dead.juv:=f*juv] %>% .[,dead.adult:=f*adult] %>%
             .[,.(dead.juv=sum(dead.juv),juv=sum(juv),dead.adult=sum(dead.adult),adult=sum(adult)),by=.(year,season)] %>%
             .[,F.juv:=(dead.juv/juv)] %>% .[,F.adult:=(dead.adult/adult)] %>% .[,.(F.juv=mean(F.juv)*4,F.adult=mean(F.adult)*4),by=year] %>%
-            data.table::setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
+            setnames(.,c("year"),c("time")) %>% .[,model:=tmp.name] %>% .[,region:="All regions"]
         } else {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,juv:=prop.juv[age]*N] %>% .[,adult:=prop.adult[age]*N] %>% .[,dead.juv:=f*juv] %>% .[,dead.adult:=f*adult] %>%
             .[,.(dead.juv=sum(dead.juv),juv=sum(juv),dead.adult=sum(dead.adult),adult=sum(adult)),by=.(year,season,area)] %>%
             .[,F.juv:=(dead.juv/juv)] %>% .[,F.adult:=(dead.adult/adult)] %>% .[,.(F.juv=mean(F.juv)*4,F.adult=mean(F.adult)*4),by=.(year,area)] %>%
-            data.table::setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
+            setnames(.,c("year","area"),c("time","region")) %>% .[,model:=tmp.name]
         }
       } else {
         mlab <- "Seasonal"
         if(agg.regions)
         {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,juv:=prop.juv[age]*N] %>% .[,adult:=prop.adult[age]*N] %>% .[,dead.juv:=f*juv] %>% .[,dead.adult:=f*adult] %>%
             .[,.(dead.juv=sum(dead.juv),juv=sum(juv),dead.adult=sum(dead.adult),adult=sum(adult)),by=.(year,season)] %>%
             .[,F.juv:=(dead.juv/juv)] %>% .[,F.adult:=(dead.adult/adult)] %>%
             .[,model:=tmp.name] %>% .[,region:="All regions"] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
         } else {
-          dt.list[[i]] <- data.table::as.data.table(fm(tmp.rep)) %>% merge(., data.table::as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
-            data.table::setnames(.,c("value.x","value.y"),c("f","N")) %>%
+          dt.list[[i]] <- as.data.table(fm(tmp.rep)) %>% merge(., as.data.table(popN(tmp.rep)),by=c("age","year","unit","season","area","iter")) %>%
+            setnames(.,c("value.x","value.y"),c("f","N")) %>%
             .[,age:=as.numeric(age)] %>% .[,year:=as.numeric(year)] %>% .[,season:=as.numeric(season)] %>% .[,area:=as.numeric(area)] %>%
             .[,juv:=prop.juv[age]*N] %>% .[,adult:=prop.adult[age]*N] %>% .[,dead.juv:=f*juv] %>% .[,dead.adult:=f*adult] %>%
             .[,.(dead.juv=sum(dead.juv),juv=sum(juv),dead.adult=sum(dead.adult),adult=sum(adult)),by=.(year,season,area)] %>%
             .[,F.juv:=(dead.juv/juv)] %>% .[,F.adult:=(dead.adult/adult)] %>%
-            data.table::setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
+            setnames(.,c("area"),c("region")) %>% .[,model:=tmp.name] %>% .[,time:=year+(season-1)/dimensions(tmp.rep)["seasons"]]
         }
       }
 
@@ -193,24 +193,24 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
     }
 
     # combine into single data.table
-    plot.dt <- data.table::rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
+    plot.dt <- rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
 
     # make plot
     # Get the colours - if all.model.names passed in using ... then it is passed to palette func
     colour_values <- palette.func(selected.model.names=names(x), ...)
     g <- plot.dt %>%
-      ggplot2::ggplot() + ggthemes::theme_few() +
-      ggplot2::geom_hline(yintercept=0) +
-      ggplot2::xlab("Year") + ggplot2::ylab("Fishing mortality") +
-      ggplot2::ggtitle(paste0(mlab, " average adult (solid) and juvenile (dashed) F")) +
-      ggplot2::geom_line(ggplot2::aes(x=time, y=F.adult, color=model), size=1) +
-      ggplot2::geom_line(ggplot2::aes(x=time, y=F.juv, color=model), size=1, linetype="longdash") +
-      ggplot2::scale_color_manual("Model", values=colour_values)
+      ggplot() + theme_few() +
+      geom_hline(yintercept=0) +
+      xlab("Year") + ylab("Fishing mortality") +
+      ggtitle(paste0(mlab, " average adult (solid) and juvenile (dashed) F")) +
+      geom_line(aes(x=time, y=F.adult, color=model), size=1) +
+      geom_line(aes(x=time, y=F.juv, color=model), size=1, linetype="longdash") +
+      scale_color_manual("Model", values=colour_values)
     if(yaxis.free)
     {
-      g <- g + ggplot2::facet_wrap(~region, scales="free_y")
+      g <- g + facet_wrap(~region, scales="free_y")
     } else {
-      g <- g + ggplot2::facet_wrap(~region)
+      g <- g + facet_wrap(~region)
     }
   }
 
@@ -222,7 +222,7 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
       stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
     } else {
       if(!dir.exists(save.dir)) dir.create(save.dir, recursive=TRUE)
-      ggplot2::ggsave(paste0(save.name, ".png"), plot=g, device="png", path=save.dir, scale=1, width=9, height=9, units="in")
+      ggsave(paste0(save.name, ".png"), plot=g, device="png", path=save.dir, scale=1, width=9, height=9, units="in")
     }
   }
 

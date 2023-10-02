@@ -55,8 +55,8 @@ determine your own palette function. Two functions currently exist:
 outputs in the same directory.}
 
 \item{\dots}{Extra arguments passed to \code{palette.func}. Use the argument
-all.model.colours to ensure consistency of model colours when plotting
-a subset of models.}
+\code{all.model.colours} to ensure consistency of model colours when
+plotting a subset of models.}
 }
 \description{
 Compare Fishing Mortality Across Different Models
