@@ -22,6 +22,10 @@
 
 plot.F.temporal <- function(rep.list, par.list=NULL, rep.names=NULL, agg.years=TRUE, agg.regions=TRUE, agg.ages=NULL, yaxis.free=FALSE, palette.func=default.model.colours, save.dir, save.name, ...)
 {
+  # Global variables for R CMD check
+  . <- ":=" <- adult <- age <- area <- dead <- dead.adult <- dead.juv <- NULL
+  f <- F.adult <- F.juv <- juv <- N <- region <- season <- time <- year <- NULL
+
   # Check and sanitise input MFCLRep arguments and names
   rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
   rep.names <- names(rep.list)

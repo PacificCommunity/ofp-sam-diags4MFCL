@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.F.temporal.r
 \name{plot.F.temporal}
 \alias{plot.F.temporal}
-\title{Compare the fishing mortality across different models.}
+\title{Compare Fishing Mortality Across Different Models}
 \usage{
 plot.F.temporal(
   rep.list,
@@ -42,5 +42,5 @@ plot.F.temporal(
 \item{...}{Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.}
 }
 \description{
-Compare the fishing mortality across different models.
+Compare Fishing Mortality Across Different Models
 }
