@@ -5,7 +5,7 @@
 \title{Compare Fishing Mortality Across Different Models}
 \usage{
 plot.F.temporal(
-  rep.list,
+  x,
   par.list = NULL,
   rep.names = NULL,
   agg.years = TRUE,
@@ -19,11 +19,11 @@ plot.F.temporal(
 )
 }
 \arguments{
-\item{rep.list}{A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.}
+\item{x}{A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.}
 
 \item{par.list}{Optional. A list of MFCLPar objects or a single MFCLPar object. Used for plotting juvenile and adult fishing mortality. If specified then agg.ages is ignored}
 
-\item{rep.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.}
+\item{rep.names}{A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the x list (if available) or generated automatically.}
 
 \item{agg.years}{TRUE or FALSE. Should model outputs be aggregated to an annual time step.}
 

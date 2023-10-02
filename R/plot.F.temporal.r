@@ -1,8 +1,8 @@
 #' Compare Fishing Mortality Across Different Models
 #'
-#' @param rep.list A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
+#' @param x A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
 #' @param par.list Optional. A list of MFCLPar objects or a single MFCLPar object. Used for plotting juvenile and adult fishing mortality. If specified then agg.ages is ignored
-#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the rep.list (if available) or generated automatically.
+#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the x list (if available) or generated automatically.
 #' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
 #' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
 #' @param agg.ages A vector of age classes to average F over. Default is all age classes.
@@ -12,7 +12,7 @@
 #' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
 #' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #'
-#' @import FLR4MFCL
+#' @importFrom FLR4MFCL dimensions fm m_at_age mat popN
 #' @import magrittr
 #' @importFrom data.table as.data.table rbindlist setnames
 #' @importFrom ggthemes theme_few
@@ -20,30 +20,31 @@
 #'
 #' @export
 
-plot.F.temporal <- function(rep.list, par.list=NULL, rep.names=NULL, agg.years=TRUE, agg.regions=TRUE, agg.ages=NULL, yaxis.free=FALSE, palette.func=default.model.colours, save.dir, save.name, ...)
+plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, agg.regions=TRUE, agg.ages=NULL, yaxis.free=FALSE, palette.func=default.model.colours, save.dir, save.name, ...)
 {
   # Global variables for R CMD check
   . <- ":=" <- adult <- age <- area <- dead <- dead.adult <- dead.juv <- NULL
-  f <- F.adult <- F.juv <- juv <- N <- region <- season <- time <- year <- NULL
+  f <- F.adult <- F.juv <- juv <- model <- N <- region <- season <- time <- NULL
+  year <- NULL
 
   # Check and sanitise input MFCLRep arguments and names
-  rep.list <- check.rep.args(rep=rep.list, rep.names=rep.names)
-  rep.names <- names(rep.list)
+  x <- check.rep.args(rep=x, rep.names=rep.names)
+  rep.names <- names(x)
 
-  dt.list <- as.list(rep(NA, length(rep.list)))
-  names(dt.list) <- names(rep.list)
+  dt.list <- as.list(rep(NA, length(x)))
+  names(dt.list) <- names(x)
 
   if(is.null(par.list))
   {
     if(is.null(agg.ages))
     {
-      agg.ages <- 1:length(m_at_age(rep.list[[1]]))
+      agg.ages <- 1:length(m_at_age(x[[1]]))
     }
 
     for(i in 1:length(dt.list))
     {
-      tmp.rep <- rep.list[[i]]
-      tmp.name <- names(rep.list)[i]
+      tmp.rep <- x[[i]]
+      tmp.name <- names(x)[i]
       if(agg.years)
       {
         mlab <- "Annual"
@@ -92,7 +93,7 @@ plot.F.temporal <- function(rep.list, par.list=NULL, rep.names=NULL, agg.years=T
 
     # make plot
     # Get the colours - if all.model.names passed in using ... then it is passed to palette func
-    colour_values <- palette.func(selected.model.names=names(rep.list), ...)
+    colour_values <- palette.func(selected.model.names=names(x), ...)
     g <- plot.dt %>%
       ggplot2::ggplot() + ggthemes::theme_few() +
       ggplot2::geom_hline(yintercept=0) +
@@ -113,13 +114,13 @@ plot.F.temporal <- function(rep.list, par.list=NULL, rep.names=NULL, agg.years=T
     }
 
     par.list <- check.par.args(par=par.list, par.names=rep.names)
-    par.names <- names(rep.list)
+    par.names <- names(x)
 
     for(i in 1:length(dt.list))
     {
-      tmp.rep <- rep.list[[i]]
+      tmp.rep <- x[[i]]
       tmp.par <- par.list[[i]]
-      tmp.name <- names(rep.list)[i]
+      tmp.name <- names(x)[i]
 
       prop.adult <- mat(tmp.par)
       # find the maximum and make the rest also = 1
@@ -178,7 +179,7 @@ plot.F.temporal <- function(rep.list, par.list=NULL, rep.names=NULL, agg.years=T
 
     # make plot
     # Get the colours - if all.model.names passed in using ... then it is passed to palette func
-    colour_values <- palette.func(selected.model.names=names(rep.list), ...)
+    colour_values <- palette.func(selected.model.names=names(x), ...)
     g <- plot.dt %>%
       ggplot2::ggplot() + ggthemes::theme_few() +
       ggplot2::geom_hline(yintercept=0) +
