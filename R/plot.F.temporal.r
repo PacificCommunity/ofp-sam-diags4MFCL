@@ -38,7 +38,10 @@
 #'
 #' @export
 
-plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, agg.regions=TRUE, agg.ages=NULL, yaxis.free=FALSE, palette.func=default.model.colours, save.dir, save.name, ...)
+plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE,
+                            agg.regions=TRUE, agg.ages=NULL, yaxis.free=FALSE,
+                            palette.func=default.model.colours, save.dir,
+                            save.name, ...)
 {
   # Global variables for R CMD check
   . <- ":=" <- adult <- age <- area <- dead <- dead.adult <- dead.juv <- NULL
@@ -107,16 +110,18 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
     }
 
     # combine into single data.table
-    plot.dt <- rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
+    plot.dt <- rbindlist(dt.list) %>%
+      .[,model:=factor(as.character(model),levels=rep.names)]
 
     # make plot
-    # Get the colours - if all.model.names passed in using ... then it is passed to palette func
+    # Get colours - pass ... to palette.func
     colour_values <- palette.func(selected.model.names=names(x), ...)
     g <- plot.dt %>%
       ggplot() + theme_few() +
       geom_hline(yintercept=0) +
       xlab("Year") + ylab("Fishing mortality") +
-      ggtitle(paste0(mlab, " average F, age classes: ", paste0(range(agg.ages), collapse="-"))) +
+      ggtitle(paste0(mlab, " average F, age classes: ",
+                     paste0(range(agg.ages), collapse="-"))) +
       geom_line(aes(x=time, y=F, color=model), size=1) +
       scale_color_manual("Model", values=colour_values)
     if(yaxis.free)
@@ -128,7 +133,8 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
   } else {
     if(!is.null(agg.ages))
     {
-      print("You have supplied the par file so agg.ages will be ignored. Juvenile and adult F will be plotted instead.")
+      message("You have supplied the par file so agg.ages will be ignored.\n",
+              "Juvenile and adult F will be plotted instead.")
     }
 
     par.list <- check.par.args(par=par.list, par.names=rep.names)
@@ -193,10 +199,11 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
     }
 
     # combine into single data.table
-    plot.dt <- rbindlist(dt.list) %>% .[,model:=factor(as.character(model),levels=rep.names)]
+    plot.dt <- rbindlist(dt.list) %>%
+      .[,model:=factor(as.character(model),levels=rep.names)]
 
     # make plot
-    # Get the colours - if all.model.names passed in using ... then it is passed to palette func
+    # Get colours - pass ... to palette.func
     colour_values <- palette.func(selected.model.names=names(x), ...)
     g <- plot.dt %>%
       ggplot() + theme_few() +
@@ -204,7 +211,8 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
       xlab("Year") + ylab("Fishing mortality") +
       ggtitle(paste0(mlab, " average adult (solid) and juvenile (dashed) F")) +
       geom_line(aes(x=time, y=F.adult, color=model), size=1) +
-      geom_line(aes(x=time, y=F.juv, color=model), size=1, linetype="longdash") +
+      geom_line(aes(x=time, y=F.juv, color=model), size=1,
+                linetype="longdash") +
       scale_color_manual("Model", values=colour_values)
     if(yaxis.free)
     {
@@ -219,10 +227,11 @@ plot.F.temporal <- function(x, par.list=NULL, rep.names=NULL, agg.years=TRUE, ag
   {
     if(missing(save.name))
     {
-      stop("How can you save the output if you haven't specified the directory? Please specify save.dir.")
+      stop("please specify save.dir")
     } else {
       if(!dir.exists(save.dir)) dir.create(save.dir, recursive=TRUE)
-      ggsave(paste0(save.name, ".png"), plot=g, device="png", path=save.dir, scale=1, width=9, height=9, units="in")
+      ggsave(paste0(save.name, ".png"), plot=g, device="png", path=save.dir,
+             scale=1, width=9, height=9, units="in")
     }
   }
 
