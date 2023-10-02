@@ -1,16 +1,16 @@
 #' Compare Fishing Mortality Across Different Models
 #'
-#' @param x A list of MFCLRep objects or a single MFCLRep object. The reference model should be listed first.
-#' @param par.list Optional. A list of MFCLPar objects or a single MFCLPar object. Used for plotting juvenile and adult fishing mortality. If specified then agg.ages is ignored
-#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the x list (if available) or generated automatically.
-#' @param agg.years TRUE or FALSE. Should model outputs be aggregated to an annual time step.
-#' @param agg.regions TRUE or FALSE. Should model outputs be aggregated across all regions are kept separate.
+#' @param x A list of \code{MFCLRep} objects or a single \code{MFCLRep} object. The reference model should be listed first.
+#' @param par.list Optional list of \code{MFCLPar} objects or a single \code{MFCLPar} object. Used for plotting juvenile and adult fishing mortality. If specified then \code{agg.ages} is ignored.
+#' @param rep.names A vector of character strings naming the models for plotting purposes. If not supplied, model names will be taken from the names in the \code{x} list (if available) or generated automatically.
+#' @param agg.years \code{TRUE} or \code{FALSE}. Should model outputs be aggregated to an annual time step.
+#' @param agg.regions \code{TRUE} or \code{FALSE}. Should model outputs be aggregated across all regions or kept separate.
 #' @param agg.ages A vector of age classes to average F over. Default is all age classes.
-#' @param yaxis.free TRUE or FALSE. Default is FALSE. If TRUE and agg.regions is also TRUE than the y-axis scales will be independent across regions, otherwise they will be shared so regional scaling will be apparent.
-#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: default.model.colours() and colourblind.model.colours().
-#' @param save.dir Path to the directory where the outputs will be saved
-#' @param save.name Name stem for the output, useful when saving many model outputs in the same directory
-#' @param ... Passes extra arguments to the palette function. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
+#' @param yaxis.free \code{TRUE} or \code{FALSE}. If \code{TRUE} and \code{agg.regions} is also \code{TRUE} then the y-axis scales will be independent across regions, otherwise they will be shared to show regional scaling.
+#' @param palette.func A function to determine the colours of the models. The default palette has the reference model in black. It is possible to determine your own palette function. Two functions currently exist: \code{default.model.colours} and \code{colourblind.model.colours}.
+#' @param save.dir Path to the directory where the outputs will be saved.
+#' @param save.name Name stem for the output, useful when saving many model outputs in the same directory.
+#' @param \dots Extra arguments passed to \code{palette.func}. Use the argument all.model.colours to ensure consistency of model colours when plotting a subset of models.
 #'
 #' @importFrom FLR4MFCL dimensions fm m_at_age mat popN
 #' @import magrittr
